@@ -1,0 +1,21 @@
+.vh-100 {
+  height: 100vh;
+}
+
+.bg-primary {
+  background-color: #005baa !important;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+span {
+  user-select: none;
+}
+
+@media (max-width: 992px) {
+  .d-lg-flex {
+    display: none !important;
+  }
+}
