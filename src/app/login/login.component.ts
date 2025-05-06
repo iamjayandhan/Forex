@@ -1,43 +1,60 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { AuthService } from '../services/auth.service';
+import { UserService } from '../services/user.service';  // Import UserService
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';  // Importing Router to navigate after login
-import { AuthService } from '../services/auth.service';  // Import the AuthService
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  imports: [CommonModule, FormsModule]
+  standalone:true,
+  imports: [FormsModule,CommonModule,RouterLink]
 })
+
 export class LoginComponent {
-  username: string = '';
+  email: string = '';
   password: string = '';
   showPassword: boolean = false;
-  errorMsg: string = '';  // For displaying login errors
+  errorMsg: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService, 
+    private userService: UserService,  // Inject UserService
+    private router: Router
+  ) {}
 
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
 
   onSubmit() {
-    if (this.username && this.password) {
-      // AuthService to handle the login!
-      this.authService.login({ email: this.username, password: this.password }).subscribe({
-        next: () => {
-          // On success!
-          this.router.navigate(['/dashboard']);
+    if (this.email && this.password) {
+      this.authService.login({ email: this.email, password: this.password }).subscribe({
+        next: (res) => {
+          if (res && res.data.token) {
+              console.log(res);
+              console.log(res.data.token);
+              // Fetch the updated user profile after login
+              this.userService.getUserProfile().subscribe(response => {
+                const userData = response.data;
+                this.userService.setUser(userData);  // Store the user data in BehaviorSubject
+
+                console.log("User profile: ", userData);
+                console.log("going to dashboard!");
+                this.router.navigate(['/dashboard']);
+            });
+          } else {
+            this.errorMsg = 'No token received from server.';
+          }
         },
         error: (err) => {
-          // error!
           this.errorMsg = err.error.message || 'Login failed, please try again.';
         }
       });
     } else {
-      this.errorMsg = 'Username and password are required.';
+      this.errorMsg = 'Email and password are required.';
     }
   }
 }

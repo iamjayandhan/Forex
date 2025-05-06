@@ -2,6 +2,18 @@
   <h2>Welcome to the Dashboard!</h2>
   <p>You're successfully logged in.</p>
 
+  <p *ngIf="user">Logged in as: <strong>{{ user.fullName }}</strong> ({{ user.email }})</p>
+  <p *ngIf="!user">Loading user info...</p>
+
+  <!-- Other user details -->
+  <ul *ngIf="user" style="list-style-type: none; padding: 0;">
+    <li><strong>Username:</strong> {{ user.username }}</li>
+    <li><strong>Mobile:</strong> {{ user.mobileNumber }}</li>
+    <li><strong>DOB:</strong> {{ user.dateOfBirth }}</li>
+    <li><strong>Role:</strong> {{ user.role }}</li>
+    <li><strong>Status:</strong> {{ user.active ? 'Active' : 'Inactive' }}</li>
+  </ul>
+
   <!-- Logout Button -->
   <button (click)="logout()" class="btn btn-danger">Logout</button>
 </div>

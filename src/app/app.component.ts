@@ -9,6 +9,7 @@ import { RouterOutlet } from '@angular/router';
   standalone: true,
   imports: [FormsModule,RouterOutlet],
 })
+
 export class AppComponent {
   title = 'Angular Authentication Demo';
 }

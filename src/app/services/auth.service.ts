@@ -1,31 +1,59 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-environment
-import { Observable } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map, tap} from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { Router } from '@angular/router';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   private BASE_URL = `${environment.apiUrl}/auth`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router:Router) {}
 
-  login(credentials: { email: string, password: string }): Observable<any> {
-    return this.http.post(`${this.BASE_URL}/login`, credentials);
+  login(payload: { email: string, password: string }): Observable<any> {
+    return this.http.post<any>(`${this.BASE_URL}/login`, payload, {
+      withCredentials: true,
+    });
   }
 
-  //helpers!
-  isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+  register(user: {
+    username: string;
+    email: string;
+    password: string;
+    fullName: string;
+    mobileNumber: string;
+    dateOfBirth: string;
+  }): Observable<any> {
+    return this.http.post<any>(`${this.BASE_URL}/register`, user);
   }
 
-  logout(): void {
-    localStorage.removeItem('token');
+  // Updated isLoggedIn method
+  //this is sync method!
+  isLoggedIn(): Observable<boolean> {
+    console.log('[AuthService] Calling /me API');
+    return this.http.get<any>(`${this.BASE_URL}/me`, { withCredentials: true }).pipe(
+      map((response) => {
+        console.log('[AuthService] /me response:', response);
+        return !!response?.data?.active;
+      }),
+      catchError((err) => {
+        console.error('[AuthService] /me error:', err);
+        return of(false);
+      })
+    );
   }
+  
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
+  logout(): Observable<any> {
+    return this.http.post(`${this.BASE_URL}/logout`, {}, { withCredentials: true }).pipe(
+      tap(() => {
+        console.log('Logout success!');
+      }),
+      catchError((err) => {
+        console.log('Logout failed!', err);
+        return throwError(() => new Error(err)); //again an observable!
+      })
+    );
   }
 }

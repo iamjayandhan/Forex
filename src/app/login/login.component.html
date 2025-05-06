@@ -21,36 +21,39 @@
         <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
 
           <div class="mb-3">
-            <label for="username" class="form-label fw-bold">User Name</label>
+            <label for="email" class="form-label fw-bold">Email</label>
             <input
               type="text"
-              id="username"
-              name="username"
+              id="email"
+              name="email"
               class="form-control"
               placeholder="Enter User Name"
-              [(ngModel)]="username"
+              [(ngModel)]="email"
               required>
-            <div *ngIf="loginForm.submitted && !username" class="form-text text-danger">
-              UserName required.
+            <div *ngIf="loginForm.submitted && !email" class="form-text text-danger">
+              Email required.
             </div>
           </div>
 
           <div class="mb-3 position-relative">
             <label for="password" class="form-label fw-bold">Password</label>
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              id="password"
-              name="password"
-              class="form-control"
-              placeholder="Enter password"
-              [(ngModel)]="password"
-              required>
-            <span
-              class="position-absolute top-50 end-0 translate-middle-y me-3"
-              style="cursor: pointer;"
-              (click)="togglePassword()">
-              {{ showPassword ? '🙈' : '👁' }}
-            </span>
+            <div class="position-relative">
+                <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                name="password"
+                class="form-control"
+                placeholder="Enter password"
+                [(ngModel)]="password"
+                required>
+              <span
+                class="position-absolute top-50 end-0 translate-middle-y me-3"
+                style="cursor: pointer;"
+                (click)="togglePassword()">
+                {{ showPassword ? '🙈' : '👁' }}
+              </span>
+            </div>
+            
             <div *ngIf="loginForm.submitted && !password" class="form-text text-danger">
               Password required.
             </div>
@@ -63,6 +66,9 @@
           <div class="d-grid">
             <button type="submit" class="btn btn-primary">Login</button>
           </div>
+
+          <a [routerLink]="['/resetPwd']" class="text-decoration-none text-primary">Forgot Password?</a>
+
 
           <!-- Error Message (if any) -->
           <div *ngIf="errorMsg" class="text-danger text-center mt-3">
