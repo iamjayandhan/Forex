@@ -22,7 +22,6 @@ export class DashboardComponent implements OnInit{
         next: (response)=>{
           console.log("user data fetched: ",response.data);
           this.userService.setUser(response.data);
-         
         },
         error: (err) =>{
             console.log("Error fetching user profile!",err);

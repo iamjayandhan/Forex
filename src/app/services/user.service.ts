@@ -19,16 +19,16 @@ export class UserService {
     return this.http.get<any>(`${environment.apiUrl}/auth/me`,{withCredentials:true});
   }
 
-  // Update user profile (e.g., fullName, etc.)
-  // updateUserProfile(updatedProfile: UserProfile) {
-  //   return this.http.put<UserProfile>(`${environment.apiUrl}/auth/update-profile`, updatedProfile)
-  //     .pipe(
-  //       tap((updated: UserProfile) => {
-  //         // After update, push the updated profile to the BehaviorSubject
-  //         this.setUser(updated);
-  //       })
-  //     );
-  // }
+  // Update user profile (fullname, DOB, mobile)
+  updateUserProfile(updatedProfile: any) {
+    return this.http.post<any>(`${environment.apiUrl}/auth/update`, updatedProfile,{ withCredentials:true})
+      .pipe(
+        tap((updated: any) => {
+          // After update, push the updated profile to the BehaviorSubject
+          this.setUser(updated);
+        })
+      );
+  }
 
   // Set user data into the BehaviorSubject
   setUser(user: UserProfile) {

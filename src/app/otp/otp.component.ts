@@ -72,6 +72,7 @@ export class OtpComponent implements OnInit, OnDestroy {
   this.otpService.sendOtp(data).subscribe({
     next: () => {
       this.notyf.success('OTP sent successfully!');
+      
       localStorage.setItem('email', email);
       this.otpSent = true;
       this.otpVerified = false;

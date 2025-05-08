@@ -67,8 +67,11 @@
             <button type="submit" class="btn btn-primary">Login</button>
           </div>
 
-          <a [routerLink]="['/resetPwd']" class="text-decoration-none text-primary">Forgot Password?</a>
-
+          
+          <div class="d-flex justify-content-between w-100 mt-3">
+            <a [routerLink]="['/resetPwd']" class="text-decoration-none text-primary ">Forgot Password?</a>
+            <a [routerLink]="['/register']" class="text-decoration-none text-primary">New? join here.</a>
+          </div>
 
           <!-- Error Message (if any) -->
           <div *ngIf="errorMsg" class="text-danger text-center mt-3">

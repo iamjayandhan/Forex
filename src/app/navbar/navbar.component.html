@@ -1,0 +1,71 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <!-- Logo and Navbar Links -->
+      <a class="navbar-brand" (click)="navigateTo('dashboard')">ForexTrader</a>
+  
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+  
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" (click)="navigateTo('dashboard')">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="navigateTo('market')">Market</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="navigateTo('portfolio')">My Portfolio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="navigateTo('transactions')">Transactions</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="navigateTo('funds')">Deposit/Withdraw</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="navigateTo('help')">Help</a>
+          </li>
+        </ul>
+      </div>
+  
+      <!-- Right Side - User Profile and Notifications -->
+      <div class="d-flex align-items-center">
+        <span class="notification-icon me-3" title="Notifications">🔔</span>
+  
+        <div class="dropdown">
+          <button class="btn btn-link dropdown-toggle" type="button" id="userProfile" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" class="avatar rounded-circle" />
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userProfile">
+            <li *ngIf="user" class="dropdown-item">
+              <strong>{{ user.fullName }}</strong><br />
+              <small>{{ user.email }}</small>
+            </li>
+            <li *ngIf="user" class="dropdown-item">
+              <strong>Username:</strong> {{ user.username }}
+            </li>
+            <li *ngIf="user" class="dropdown-item">
+              <strong>Mobile:</strong> {{ user.mobileNumber }}
+            </li>
+            <li *ngIf="user" class="dropdown-item">
+              <strong>DOB:</strong> {{ user.dateOfBirth }}
+            </li>
+            <li *ngIf="user" class="dropdown-item">
+              <strong>Role:</strong> {{ user.role }}
+            </li>
+            <li>
+                <button class="dropdown-item" (click)="viewProfile()">View profile</button>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <button class="dropdown-item" (click)="logout()">Logout</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <app-profile *ngIf="showProfileModel" [user]="user" (close)="closeProfile()"></app-profile>

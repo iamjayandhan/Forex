@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service'; // Import the AuthService
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { NotyfService } from '../services/notyf.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [CommonModule, FormsModule]  // Use FormsModule for template-driven form
+  imports: [CommonModule, FormsModule,RouterLink] 
 })
 export class RegisterComponent {
   username: string = '';
@@ -22,7 +23,11 @@ export class RegisterComponent {
   successMsg: string = '';  
   showPassword: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private notyf: NotyfService
+  ) {}
 
   togglePassword() {
     this.showPassword = !this.showPassword;
@@ -41,13 +46,19 @@ export class RegisterComponent {
       }).subscribe({
         next: (res) => {
           this.successMsg = res.message || 'Registration successful!';
-          setTimeout(() => this.router.navigate(['/login']), 2000);
+          this.notyf.success("Registration successful!");
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+            this.notyf.success("Navigating to login page.");
+          }, 2000);
         },
         error: (err) => {
+          this.notyf.error(err.error?.message || "Registration failed. Please try again.");
           this.errorMsg = err.error?.message || 'Registration failed. Please try again.';
         }
       });
     } else {
+      this.notyf.error("All fields are required.");
       this.errorMsg = 'All fields are required.';
     }
   }

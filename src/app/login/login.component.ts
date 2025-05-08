@@ -4,6 +4,7 @@ import { UserService } from '../services/user.service';  // Import UserService
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { NotyfService } from '../services/notyf.service';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,8 @@ export class LoginComponent {
   constructor(
     private authService: AuthService, 
     private userService: UserService,  // Inject UserService
-    private router: Router
+    private router: Router,
+    private notyf : NotyfService
   ) {}
 
   togglePassword() {
@@ -43,17 +45,22 @@ export class LoginComponent {
 
                 console.log("User profile: ", userData);
                 console.log("going to dashboard!");
+
+                this.notyf.success("Login success!");
                 this.router.navigate(['/dashboard']);
             });
           } else {
+            this.notyf.error("No token received from server.");
             this.errorMsg = 'No token received from server.';
           }
         },
         error: (err) => {
-          this.errorMsg = err.error.message || 'Login failed, please try again.';
+          this.notyf.error(err.error?.message || "Login failed, please try again.");
+          this.errorMsg = err.error?.message || 'Login failed, please try again.';
         }
       });
     } else {
+      this.notyf.error("Email and password are required.");
       this.errorMsg = 'Email and password are required.';
     }
   }

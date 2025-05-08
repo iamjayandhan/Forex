@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Notyf } from 'notyf'; // Import Notyf
-import 'notyf/notyf.min.css'; // Import Notyf CSS
+import { Notyf } from 'notyf'; 
+import 'notyf/notyf.min.css'; 
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +11,11 @@ export class NotyfService {
   constructor() {
     // Initialize Notyf instance
     this.notyf = new Notyf({
-      duration: 4000, // Notification duration
-      ripple: true,   // Enable ripple effect
+      duration: 4000, 
+      ripple: true,   
       position: {
-        x: 'right',   // Position on the right
-        y: 'top'      // Position on the top
+        x: 'right',   
+        y: 'top'
       }
     });
   }
