@@ -1,0 +1,80 @@
+<div class="container mt-4">
+    <h3>Available Stocks</h3>
+  
+    <div *ngIf="loading">Loading stocks...</div>
+    <div *ngIf="error" class="text-danger">{{ error }}</div>
+  
+    <!-- Search Bar -->
+    <div class="mb-3">
+      <input type="text" class="form-control" placeholder="Search stocks..." [(ngModel)]="searchQuery" (input)="onSearch()">
+    </div>
+  
+    <!-- Records Per Page -->
+    <div class="mb-3">
+      <label>Records per page:</label>
+      <select class="form-control" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+        <option [value]="50">50</option>
+      </select>
+    </div>
+  
+    <!-- Stocks Table -->
+    <table *ngIf="!loading && !error && stocks.length > 0" class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Logo</th>
+          <th>Name</th>
+          <th>Symbol</th>
+          <th>Exchange</th>
+          <th>Sector</th>
+          <th>Description</th>
+          <th>Current Price(₹)</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stock of stocks">
+          <td>
+            <img [src]="stock.imageUrl" alt="{{ stock.name }} Logo" style="object-fit: contain;" width="50" height="50" class="rounded border">
+          </td>
+          <td>{{ stock.name }}</td>
+          <td>{{ stock.symbol }}</td>
+          <td>{{ stock.exchange }}</td>
+          <td>{{ stock.sector }}</td>
+          <td>{{ stock.description }}</td>
+          <td class="text-success fw-bold">₹{{ stock.currentPrice | number:'1.2-2' }}</td>
+           <td>
+            <button class="btn btn-primary btn-sm" (click)="goToBuy(stock)">Buy</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- No Results -->
+    <div *ngIf="!loading && !error && stocks.length === 0" class="text-muted">
+      No stocks found.
+    </div>
+  
+    <!-- Pagination Controls -->
+    <div *ngIf="totalPages > 1" class="mt-4">
+      <nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="currentPage === 0">
+            <button class="page-link" (click)="onPageChange(currentPage - 1)">Previous</button>
+          </li>
+  
+          <li class="page-item disabled">
+            <span class="page-link">
+              Page {{ currentPage + 1 }} of {{ totalPages }}
+            </span>
+          </li>
+  
+          <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+            <button class="page-link" (click)="onPageChange(currentPage + 1)">Next</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  

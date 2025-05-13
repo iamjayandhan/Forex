@@ -33,10 +33,16 @@ export class UserService {
   // Set user data into the BehaviorSubject
   setUser(user: UserProfile) {
     this.userSubject.next(user);  // Update the BehaviorSubject with the new user data
+    //since value of userSubject is updated, all subscribers will get the new value! only happens when used next()
   }
 
   //get user
   getUser(){
     return this.userSubject.value;
+  }
+
+  //balance update
+  updateWallet(data: {email: string, amount: number, operation: string}) {
+    return this.http.post<any>(`${environment.apiUrl}/auth/balance`,data, { withCredentials: true });
   }
 }

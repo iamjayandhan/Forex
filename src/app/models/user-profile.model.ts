@@ -6,5 +6,7 @@ export interface UserProfile {
   dateOfBirth: string;
   role: string;
   active: boolean;
+  balance: number;
+  mpin: string;
 }
   
