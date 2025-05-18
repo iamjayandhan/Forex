@@ -1,0 +1,49 @@
+<div class="container mx-auto p-4">
+  <h2 class="text-2xl font-bold mb-4">Portfolio Transactions</h2>
+
+  <div *ngIf="transactions.length > 0; else noTransactions">
+    <div
+      *ngFor="let txn of transactions"
+      (click)="toggleDetails(txn)"
+      [class.selected]="selectedTransaction === txn"
+      class="border p-3 mb-3 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
+    >
+      <!-- Summary info -->
+      <div class="flex items-center gap-4 mb-2">
+        <!-- <img
+          [src]="txn.stock?.imageUrl"
+          [alt]="txn.stock?.name"
+          class="w-12 h-12 object-contain"
+        /> -->
+        <div>
+          <h3>{{ txn.stock?.name }} ({{ txn.stock?.symbol }})</h3>
+          <p class="text-sm text-gray-500">{{ txn.stock?.sector }}</p>
+        </div>
+      </div>
+
+      <!-- Details shown only if selected -->
+      <div *ngIf="selectedTransaction === txn" class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm d-flex">
+        <p><strong>Type:</strong> {{ txn.transactionType }}</p>
+        <p><strong>Quantity:</strong> {{ txn.quantity }}</p>
+        <p><strong>Price/Unit:</strong> ₹{{ txn.pricePerUnit }}</p>
+        <p><strong>Subtotal:</strong> ₹{{ txn.subTotal }}</p>
+        <p><strong>Brokerage:</strong> ₹{{ txn.brokerage }}</p>
+        <p><strong>Exchange Charges:</strong> ₹{{ txn.exchangeTxnCharges }}</p>
+        <p><strong>Stamp Duty:</strong> ₹{{ txn.stampDuty }}</p>
+        <p><strong>IPFT:</strong> ₹{{ txn.ipft }}</p>
+        <p><strong>SEBI Charges:</strong> ₹{{ txn.sebiCharges }}</p>
+        <p><strong>STT:</strong> ₹{{ txn.stt }}</p>
+        <p><strong>GST:</strong> ₹{{ txn.gst }}</p>
+        <p><strong>Total Amount:</strong> ₹{{ txn.totalAmount }}</p>
+        <p class="col-span-full">
+          <strong>Timestamp:</strong>
+          {{ txn.timestamp | date: 'medium' }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noTransactions>
+    <p class="text-center text-gray-500">No transactions found.</p>
+  </ng-template>
+</div>

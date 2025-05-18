@@ -1,0 +1,17 @@
+table {
+  font-size: 0.95rem;
+}
+
+.table td,
+.table th {
+  vertical-align: middle;
+}
+
+.badge {
+  font-size: 0.8rem;
+}
+
+.selected {
+  background-color: #f0f9ff;
+  border-color: #3b82f6;
+}
