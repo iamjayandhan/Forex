@@ -14,8 +14,16 @@ span {
 user-select: none;
 }
 
-@media (max-width: 992px) {
-.d-lg-flex {
-    display: none !important;
+.text-success {
+  color: green;
 }
+.text-danger {
+  color: red;
+}
+
+
+@media (max-width: 992px) {
+    .d-lg-flex {
+        display: none !important;
+    }
 }

@@ -51,26 +51,72 @@
               </div>
             </div>
   
+           <div class="mb-3">
+            <label for="password" class="form-label fw-bold">Password</label>
+            <div class="position-relative">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                name="password"
+                class="form-control"
+                placeholder="Enter password"
+                [(ngModel)]="password"
+                (input)="onPasswordInput()"
+                required>
+              <span
+                class="position-absolute top-50 end-0 translate-middle-y me-3"
+                style="cursor: pointer;"
+                (click)="togglePassword()">
+                {{ showPassword ? '🙈' : '👁' }}
+              </span>
+            </div>
+            <div *ngIf="registerForm.submitted && !password" class="form-text text-danger">
+              Password required.
+            </div>
+
+            <!-- Password Rules -->
+            <ul class="mt-2 small ps-3">
+              <li [ngClass]="{'text-success': passwordValidations.minLength, 'text-danger': !passwordValidations.minLength}">
+                {{ passwordValidations.minLength ? '✔' : '✖' }} At least 8 characters
+              </li>
+              <li [ngClass]="{'text-success': passwordValidations.upperCase, 'text-danger': !passwordValidations.upperCase}">
+                {{ passwordValidations.upperCase ? '✔' : '✖' }} At least one uppercase letter
+              </li>
+              <li [ngClass]="{'text-success': passwordValidations.lowerCase, 'text-danger': !passwordValidations.lowerCase}">
+                {{ passwordValidations.lowerCase ? '✔' : '✖' }} At least one lowercase letter
+              </li>
+              <li [ngClass]="{'text-success': passwordValidations.digit, 'text-danger': !passwordValidations.digit}">
+                {{ passwordValidations.digit ? '✔' : '✖' }} At least one digit
+              </li>
+              <li [ngClass]="{'text-success': passwordValidations.specialChar, 'text-danger': !passwordValidations.specialChar}">
+                {{ passwordValidations.specialChar ? '✔' : '✖' }} At least one special character
+              </li>
+            </ul>
+          </div>
+
+
             <div class="mb-3">
-              <label for="password" class="form-label fw-bold">Password</label>
+              <label for="mpin" class="form-label fw-bold">MPIN (4 digits)</label>
               <div class="position-relative">
-                  <input
-                    [type]="showPassword ? 'text' : 'password'"
-                    id="password"
-                    name="password"
-                    class="form-control"
-                    placeholder="Enter password"
-                    [(ngModel)]="password"
-                    required>
-                  <span
-                    class="position-absolute top-50 end-0 translate-middle-y me-3"
-                    style="cursor: pointer;"
-                    (click)="togglePassword()">
-                    {{ showPassword ? '🙈' : '👁' }}
-                  </span>
+                <input
+                  [type]="showMPIN ? 'text' : 'password'"
+                  id="mpin"
+                  name="mpin"
+                  maxlength="4"
+                  pattern="[0-9]*"
+                  class="form-control"
+                  placeholder="Enter 4-digit MPIN"
+                  [(ngModel)]="mpin"
+                  required>
+                <span
+                  class="position-absolute top-50 end-0 translate-middle-y me-3"
+                  style="cursor: pointer;"
+                  (click)="toggleMPIN()">
+                  {{ showMPIN ? '🙈' : '👁' }}
+                </span>
               </div>
-              <div *ngIf="registerForm.submitted && !password" class="form-text text-danger">
-                Password required.
+              <div *ngIf="registerForm.submitted && !mpin" class="form-text text-danger">
+                MPIN required.
               </div>
             </div>
   

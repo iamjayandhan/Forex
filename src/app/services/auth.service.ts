@@ -24,6 +24,7 @@ export class AuthService {
     fullName: string;
     mobileNumber: string;
     dateOfBirth: string;
+    mpin: string;
   }): Observable<any> {
     return this.http.post<any>(`${this.BASE_URL}/register`, user);
   }
@@ -31,10 +32,10 @@ export class AuthService {
   // Updated isLoggedIn method
   //this is sync method!
   isLoggedIn(): Observable<boolean> {
-    console.log('[AuthService] Calling /me API');
+    // console.log('[AuthService] Calling /me API');
     return this.http.get<any>(`${this.BASE_URL}/me`, { withCredentials: true }).pipe(
       map((response) => {
-        console.log('[AuthService] /me response:', response);
+        // console.log('[AuthService] /me response:', response);
         return !!response?.data?.active;
       }),
       catchError((err) => {
