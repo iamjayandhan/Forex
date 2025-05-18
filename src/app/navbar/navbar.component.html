@@ -12,6 +12,9 @@
           <li class="nav-item">
             <a class="nav-link" (click)="navigateTo('dashboard')">Dashboard</a>
           </li>
+          <li class="nav-item" *ngIf="user?.role === 'ADMIN'">
+            <a class="nav-link" (click)="navigateTo('admin')">Admin</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" (click)="navigateTo('market')">Market</a>
           </li>

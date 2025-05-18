@@ -9,6 +9,8 @@ import { MarketComponent } from './market/market.component';
 import { BuyComponent } from './buy/buy.component';
 import { WalletComponent } from './wallet/wallet.component';
 import { TransactionsComponent } from './transactions/transactions.component';
+import { AdminComponent } from './admin/admin.component';
+import { AdminGuard } from './guard/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -20,4 +22,5 @@ export const routes: Routes = [
   { path: 'buy/:symbol', component:BuyComponent, canActivate:[AuthGuard]},
   { path: 'wallet',component: WalletComponent, canActivate:[AuthGuard]},
   { path: 'transactions/:userid',component:TransactionsComponent, canActivate:[AuthGuard]},
+  { path: 'admin', component:AdminComponent, canActivate:[AuthGuard]},
 ];
