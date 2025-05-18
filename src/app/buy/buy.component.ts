@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { NotyfService } from '../services/notyf.service';
 import { UserProfile } from '../models/user-profile.model';
 import { UserService } from '../services/user.service';
+import { PortfolioService } from '../services/portfolio.service';
 
 @Component({
   selector: 'app-buy',
@@ -12,18 +13,24 @@ import { UserService } from '../services/user.service';
   styleUrls: ['./buy.component.css'],
   standalone: true,
   imports: [CommonModule, FormsModule],
-})
+})  
 export class BuyComponent implements OnInit {
   user: UserProfile | null = null;
   enteredMPIN: string = '';
+  mpinError: string = '';
+  balanceError: string = '';
 
   stock: any;
   quantity: number = 1;
 
+  isPlacingOrder: boolean = false;
+  showConfirmModal: boolean = false;
+
   constructor(
     public router: Router,
     private notyf: NotyfService,
-    private userService: UserService
+    private userService: UserService,
+    private portfolioService: PortfolioService,
   ) {
     const navigation = this.router.getCurrentNavigation();
     this.stock = navigation?.extras?.state?.['stock'];
@@ -55,61 +62,161 @@ export class BuyComponent implements OnInit {
   }
 
   handleModalConfirm() {
+
+    this.mpinError = '';
+    this.balanceError = '';
+
     if (this.isQuantityInvalid) {
       this.notyf.error('Invalid quantity');
       return;
     }
 
     if (this.enteredMPIN !== this.user?.mpin) {
+      this.mpinError = 'Invalid MPIN';
       this.notyf.error('Invalid MPIN');
       return;
     }
 
     if (this.totalCost > (this.user?.balance || 0)) {
+      this.balanceError = 'Insufficient balance';
       this.notyf.error('Insufficient balance');
       return;
     }
 
-    const payload = {
-      email: this.user?.email,
-      amount: this.totalCost,
-      operation: 'withdraw',
-    };
-
-    this.userService.updateWallet(payload).subscribe({
-      next: (response) =>{
-        console.log("response for wallet update:",response.data.balance);
-        this.notyf.success(`✅ You bought ${this.quantity} units of ${this.stock.name} for ₹${this.totalCost}`);    
-        this.router.navigate(['/market']);
-      },
-      error: (err) => {
-        this.notyf.error('Failed to update balance. please try again');
-        console.error(err);
-      }
-    })
-
+    this.confirmBuyOrder();
   }
+
+  openConfirmModal() {
+    console.log('Modal opened');
+    this.showConfirmModal = true;
+  }
+
+  closeConfirmModal() {
+    console.log('Modal closed');
+    this.showConfirmModal = false;
+    this.enteredMPIN = '';
+    this.mpinError = '';
+    this.balanceError = '';
+  }
+
+  confirmBuyOrder() {
+  this.isPlacingOrder = true;
+
+  const orderPayload = {
+    email: this.user?.email,
+    stockId: this.stock.id,
+    quantity: this.quantity,
+    balance: this.user?.balance,
+    transactionType: 'BUY',
+    pricePerUnit: this.stock.currentPrice,
+    subtotal: this.subtotal,
+    brokerage: this.brokerage,
+    exchangeTxnCharges: this.exchangeTxnCharges,
+    stampDuty: this.stampDuty,
+    ipft: this.ipft,
+    sebiCharges: this.sebiCharges,
+    stt: this.stt,
+    gst: this.gst,
+    totalAmount: this.totalCost,
+    avgPrice: this.stock.currentPrice,
+  };
+
+  this.portfolioService.placeBuyOrder(orderPayload).subscribe({
+    next: (response) => {
+      this.isPlacingOrder = false;
+      this.closeConfirmModal();
+      this.notyf.success(response.message);
+      this.router.navigate(['/dashboard']); 
+    },
+    error: (error) => {
+      this.isPlacingOrder = false;
+      this.notyf.error('Failed to place order. Please try again.');
+      console.error(error);
+    }
+  });
+}
 
   //valid qty check
   get isQuantityInvalid(): boolean {
     return this.quantity < 1 || !Number.isInteger(this.quantity);
   }
 
-  //total cost calculation
+  //total cost calculation ============
+
+  //1. BROKERAGE:
+  //Subtotal = stock price * qty
   get subtotal(): number {
-    return this.isQuantityInvalid ? 0 : (this.stock?.currentPrice || 0) * this.quantity; //stock price from table * qty
+    return this.isQuantityInvalid ? 0 : +((this.stock?.currentPrice || 0) * this.quantity).toFixed(2); //stock price from table * qty
   }
 
-  //transaction fee and tax calculation
-  get transactionFee(): number {
-    return this.isQuantityInvalid ? 0 : this.subtotal * 0.01; //1% of subtotal
+  //Brokerage = 0.25% of subtotal
+  get brokerage(): number { 
+    return +(this.subtotal * 0.0025).toFixed(2); //0.25%
   }
 
-  get tax(): number {
-    return this.isQuantityInvalid ? 0 : this.subtotal * 0.15; //15% of subtotal
+  //2. External charges:
+  //Exchange Txn Charges(ETC)
+  //NSE: 0.00325% of the subtotal
+  //BSE: 0.0030% of the subtotal
+  //etc = subtotal * NSE/BSE rate
+  get exchangeTxnCharges(): number {
+    if (!this.stock) return 0;
+
+    const rate = this.stock.exchange === 'NSE' ? 0.0000325 : 0.00003;
+    return +(this.subtotal * rate).toFixed(2); // round to 2 decimal places
   }
 
+  //Stamp Duty = 0.015% of the subtotal
+  get stampDuty(): number { 
+    return +(this.subtotal * 0.00015).toFixed(2); //0.015%
+  }
+
+  //ipft = 0.0002 ruppee per share
+  get ipft(): number {
+    return +(this.quantity * 0.0002).toFixed(2); //0.01%
+  }
+
+  //SEBI charges = 0.0001% of the subtotal
+  get sebiCharges(): number {
+    return +(this.subtotal * 0.00001).toFixed(2); //0.01%
+  }
+
+  //3. Taxes:
+  //Securities Transaction Tax (STT) = 0.025% of the subtotal
+  get stt(): number {
+    return +(this.subtotal * 0.00025).toFixed(2); //0.025%
+  }
+
+  //GST = 18% of the brokerage
+  //GST = Etc + SEBI + brokerage
+  get gst(): number {
+    return +((this.brokerage + this.exchangeTxnCharges + this.sebiCharges) * 0.18).toFixed(2); 
+  }
+
+  // FINAL TOTAL COST
   get totalCost(): number {
-    return this.subtotal + this.transactionFee + this.tax; // subtotal + transaction fee + tax
+    return +(
+      this.subtotal +
+      this.brokerage +
+      this.exchangeTxnCharges +
+      this.stampDuty +
+      this.ipft +
+      this.sebiCharges +
+      this.stt +
+      this.gst
+    ).toFixed(2);
+  }
+
+  //extras than subtotal
+  get extras(): number {
+    return +(
+      this.brokerage +
+      this.exchangeTxnCharges +
+      this.stampDuty +
+      this.ipft +
+      this.sebiCharges +
+      this.stt +
+      this.gst
+    ).toFixed(2);
   }
 }
