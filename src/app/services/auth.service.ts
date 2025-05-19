@@ -44,7 +44,17 @@ export class AuthService {
       })
     );
   }
-  
+
+  //gets all data(specially for admin, to get role info)
+  getUserInfo(): Observable<any> {
+    return this.http.get<any>(`${this.BASE_URL}/me`, { withCredentials: true }).pipe(
+      map(response => response.data),
+      catchError(err => {
+        console.error('[AuthService] /me error:', err);
+        return of(null);
+      })
+    );
+  }
 
   logout(): Observable<any> {
     return this.http.post(`${this.BASE_URL}/logout`, {}, { withCredentials: true }).pipe(
