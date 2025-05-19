@@ -1,0 +1,117 @@
+<!-- Show message if there are no holdings -->
+<div *ngIf="holdings.length === 0" class="text-center mt-4">
+  <p>No holdings to display.</p>
+</div>
+
+  <!-- Dashboard -->
+<!-- Dashboard Summary Card -->
+<div class="m-4 p-4 border rounded shadow-sm bg-white">
+  <h4 class="mb-3">Portfolio Summary {{ totalValue  | number:'1.2-2'}}</h4>
+
+  <div class="d-flex justify-content-between mb-2">
+    <span><strong>Total Invested:</strong></span>
+    <span>₹{{ totalInvested | number:'1.2-2' }}</span>
+  </div>
+
+  <div class="d-flex justify-content-between mb-2">
+    <span><strong>Total Profit/Loss:</strong></span>
+    <span 
+      [ngClass]="{
+        'text-success': totalProfitLoss > 0,
+        'text-danger': totalProfitLoss < 0,
+        'text-muted': totalProfitLoss === 0
+      }">
+      ₹{{ totalProfitLoss | number:'1.2-2' }}
+    </span>
+  </div>
+
+  <div class="d-flex justify-content-between">
+    <span><strong>Overall Change:</strong></span>
+    <span 
+      [ngClass]="{
+        'text-success': profitLossPercent > 0,
+        'text-danger': profitLossPercent < 0,
+        'text-muted': profitLossPercent === 0
+      }">
+      {{ profitLossPercent | number:'1.2-2' }}%
+    </span>
+  </div>
+</div>
+
+
+  <!-- Records Per Page -->
+  <div class="m-4">
+    <label>Records per page:</label>
+    <select class="form-control w-25" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+      <option [value]="5">5</option>
+      <option [value]="10">10</option>
+      <option [value]="20">20</option>
+    </select>
+  </div>
+
+<!-- Loop through and display each holding -->
+<div *ngFor="let holding of holdings; let i = index" class="holding-card mb-4 p-3 border rounded shadow-sm">
+  <h3 class="mb-2">
+    {{ (currentPage * pageSize) + i + 1 }}.
+    {{ holding.stock.name }} ({{ holding.stock.symbol }})
+  </h3>
+
+  <div class="d-flex justify-content-between align-items-start">
+    <!-- LEFT: Image and stock details -->
+    <div class="d-flex">
+      <img [src]="holding.stock.imageUrl" 
+           [alt]="holding.stock.name" 
+           width="50" 
+           class="me-2 rounded" />
+      <div>
+        <p class="mb-1">Sector: {{ holding.stock.sector }}</p>
+        <p class="mb-1">Quantity: {{ holding.quantity }}</p>
+      </div>
+    </div>
+
+    <!-- RIGHT: Price and profit/loss -->
+    <div class="text-end">
+      <p class="mb-1">
+        Average Purchase Price: 
+        {{ holding.avgPrice | number:'1.2-2' }}
+      </p>
+      <p class="mb-1">
+        Current Price: 
+        {{ holding.stock.currentPrice | number:'1.2-2' }}
+      </p>
+      <p class="mb-0">
+        Profit/Loss: 
+        <span *ngIf="holding.profitLossAmount != null && holding.profitLossPercent != null"
+              [ngClass]="{
+                'profit': holding.profitLossAmount > 0,
+                'loss': holding.profitLossAmount < 0
+              }">
+          {{ holding.profitLossAmount | number:'1.2-2' }} 
+          ({{ holding.profitLossPercent | number:'1.2-2' }}%)
+        </span>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<!-- Pagination Controls -->
+<div *ngIf="totalPages > 1" class="mt-4">
+  <nav>
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 0">
+        <button class="page-link" (click)="onPageChange(currentPage - 1)">Previous</button>
+      </li>
+
+      <li class="page-item disabled">
+        <span class="page-link">
+          Page {{ currentPage + 1 }} of {{ totalPages }}
+        </span>
+      </li>
+
+      <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+        <button class="page-link" (click)="onPageChange(currentPage + 1)">Next</button>
+      </li>
+    </ul>
+  </nav>
+</div>

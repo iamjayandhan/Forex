@@ -1,0 +1,13 @@
+.profit {
+  color: green;
+  font-weight: bold;
+}
+
+.loss {
+  color: red;
+  font-weight: bold;
+}
+
+.holding-card{
+    margin: 2rem;
+}
