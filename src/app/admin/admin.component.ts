@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../services/user.service';
 import { UserProfile } from '../models/user-profile.model';
+import { Stock } from '../models/stock.model';
 
 @Component({
   selector: 'app-admin',
@@ -18,26 +19,31 @@ export class AdminComponent implements OnInit {
 
   user: UserProfile | null = null;
   stocks: any[] = [];
+
+  //for the pagination
   searchQuery: string = '';
   pageSize: number = 10;
   currentPage: number = 0;
   totalRecords: number = 0;
 
+  //wallet information
   currentWallet: number = 0;
   
   loading: boolean = true;
   error: string | null = null;
   
-  showAddForm : boolean = false; 
+  showForm : boolean = false; 
+  editMode: boolean = false;
+  editedStockId: number | null = null;
   
   newStock = {
     name: '',
     symbol: '',
     imageUrl: '',
-    currentPrice: null,
+    currentPrice: 0,
     sector: '',
     description: '',
-    ipoQty: null,
+    ipoQty: 0,
     exchange: ''
   };
 
@@ -72,6 +78,40 @@ export class AdminComponent implements OnInit {
       this.notyf.error("Please fill required fields.");
       return;
     }
+    
+    let payload = {
+      name: this.newStock.name,
+      symbol: this.newStock.symbol,
+      imageUrl: this.newStock.imageUrl,
+      currentPrice: this.newStock.currentPrice,
+      sector: this.newStock.sector,
+      description: this.newStock.description,
+      ipoQty: this.newStock.ipoQty,
+      exchange: this.newStock.exchange
+    }
+    
+    this.stockService.createStock(payload).subscribe({
+      next: () => {
+        this.notyf.success('Stock added successfully');
+        this.fetchStocks();
+      },
+      error: () => {
+        this.error = 'Failed to add stock';
+        this.notyf.error(this.error);
+      }
+    });
+    
+    this.resetStockInfo();
+    this.showForm = false;
+  }
+  
+  updateStock(): void {
+    if(!this.newStock.name || !this.newStock.symbol || !this.newStock.imageUrl || !this.newStock.currentPrice || !this.newStock.sector
+      || !this.newStock.description || !this.newStock.ipoQty || !this.newStock.exchange
+    ){
+      this.notyf.error("Please fill required fields.");
+      return;
+    }
 
     let payload = {
       name: this.newStock.name,
@@ -84,37 +124,56 @@ export class AdminComponent implements OnInit {
       exchange: this.newStock.exchange
     }
 
-    this.stockService.createStock(payload).subscribe({
-      next: (response) => {
-        this.notyf.success('Stock added successfully');
-        this.fetchStocks();
-      },
-      error: (err) => {
-        this.error = 'Failed to add stock';
-        this.notyf.error(this.error);
-      }
-    });
+    console.log("PAYLOAD",payload);
+    console.log("EDITED STOCK ID",this.editedStockId)
 
-    //do operations
+    if (this.editedStockId) {
+      this.stockService.updateStock(this.editedStockId, payload).subscribe({
+        next: () => {
+          this.notyf.success('Stock updated successfully');
+          this.fetchStocks();
+        },
+        error: () => {
+          this.error = 'Failed to update stock';
+          this.notyf.error(this.error);
+        }
+      });
+    }
 
-    this.resetNewStock();
-    this.showAddForm = false;
+    this.resetStockInfo();
+    this.showForm = false;
   }
+
+  onSubmit(): void {
+    if (this.editMode) {
+      this.updateStock();
+    } else {
+      this.addStock();
+    }
+  }
+
 
   cancelAdd() {
-    this.resetNewStock();
-    this.showAddForm = false;
+    this.resetStockInfo();
+    this.showForm = false;
   }
 
-  resetNewStock() {
+  cancelEdit(): void {
+    this.resetStockInfo();
+    this.showForm = false;
+    this.editMode = false;
+    this.editedStockId = null;
+  }
+  
+  resetStockInfo() {
     this.newStock = {
       name: '',
       symbol: '',
       imageUrl: '',
-      currentPrice: null,
+      currentPrice: 0,
       sector: '',
       description: '',
-      ipoQty: null,
+      ipoQty: 0,
       exchange: ''
     };
   }
@@ -123,6 +182,7 @@ export class AdminComponent implements OnInit {
     this.loading = true;
     this.stockService.getPaginatedStocks(this.currentPage, this.pageSize, this.searchQuery).subscribe({
       next: (response) => {
+        // console.log(response.data.content);
         const result = response.data;
         this.stocks = result.content;
         this.totalRecords = result.totalElements;
@@ -132,6 +192,35 @@ export class AdminComponent implements OnInit {
         this.error = 'Failed to load stocks';
         this.notyf.error(this.error);
         this.loading = false;
+      }
+    });
+  }
+
+  editStock(stock: Stock): void {
+    this.editMode = true;
+    this.editedStockId = stock.id ?? null;
+    this.newStock = {
+      name: stock.name || '',
+      symbol: stock.symbol || '',
+      imageUrl: stock.imageUrl || '',
+      currentPrice: stock.currentPrice ?? 0,
+      sector: stock.sector || '',
+      description: stock.description || '',
+      ipoQty: stock.ipoQty ?? 0,
+      exchange: stock.exchange || ''
+    };
+    this.showForm = true;
+  }
+
+  deleteStock(stockId: number): void {
+    this.stockService.deleteStock(stockId).subscribe({
+      next: () => {
+        this.notyf.success('Stock deleted successfully');
+        this.fetchStocks();
+      },
+      error: () => {
+        this.error = 'Failed to delete stock';
+        this.notyf.error(this.error);
       }
     });
   }

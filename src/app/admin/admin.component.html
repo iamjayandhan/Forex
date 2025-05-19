@@ -16,55 +16,57 @@
           <option [value]="50">50</option>
         </select>
       
-        <button class="btn btn-success ms-auto" (click)="showAddForm = true">New</button>
+        <button class="btn btn-success ms-auto" (click)="showForm = true">Add new stock</button>
     </div>
 
-    <!-- Model to add stock! -->
- <div *ngIf="showAddForm" class="card p-3 mb-4">
-  <h5>Introduce that new Stock into the market!</h5>
-  <br>
-  <form (ngSubmit)="addStock()" #stockForm="ngForm">
-    <div class="row g-3">
-      <div class="col-md-3">
-        <label>Name: </label>
-        <input type="text" name="name" [(ngModel)]="newStock.name" required placeholder="Name" class="form-control" />
+    <!-- Model to add/ edit stock stock! -->
+  <div *ngIf="showForm" class="card p-3 mb-4">
+    <h5 *ngIf="!editMode">Introduce new stock into the market!</h5>
+    <h5 *ngIf="editMode">Please update the stock information gracefully</h5>
+    <br>
+    <form (ngSubmit)="onSubmit()" #stockForm="ngForm">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label>Name: </label>
+          <input type="text" name="name" [(ngModel)]="newStock.name" required placeholder="Name" class="form-control" />
+        </div>
+        <div class="col-md-2">
+          <label>Ticker symbol: </label>
+          <input type="text" name="symbol" [(ngModel)]="newStock.symbol" required placeholder="Symbol" class="form-control" />
+        </div>
+        <div class="col-md-2">
+          <label>Exchange: </label>
+          <input type="text" name="exchange" [(ngModel)]="newStock.exchange" required placeholder="Exchange" class="form-control" />
+        </div>
+        <div class="col-md-2">
+          <label>Image URL: </label>
+          <input type="text" name="imageUrl" [(ngModel)]="newStock.imageUrl" required placeholder="image Url" class="form-control" />
+        </div>
+        <div class="col-md-2">
+          <label>Sector: </label>
+          <input type="text" name="sector" [(ngModel)]="newStock.sector" required placeholder="Sector" class="form-control" />
+        </div>
+        <div class="col-md-2">
+          <label>Description: </label>
+          <input type="text" name="description" [(ngModel)]="newStock.description" required placeholder="description" class="form-control" />
+        </div>
+        <div class="col-md-3">
+          <label>IPO Quantity: </label>
+          <input type="number" name="ipoQty" [(ngModel)]="newStock.ipoQty" required placeholder="Initial Public Offering" class="form-control">
+        </div>
+        <div class="col-md-3">
+          <label>Initial Price: </label>
+          <input type="number" name="currentPrice" [(ngModel)]="newStock.currentPrice" required placeholder="Current Price" class="form-control" />
+        </div>
       </div>
-      <div class="col-md-2">
-        <label>Ticker symbol: </label>
-        <input type="text" name="symbol" [(ngModel)]="newStock.symbol" required placeholder="Symbol" class="form-control" />
-      </div>
-      <div class="col-md-2">
-        <label>Exchange: </label>
-        <input type="text" name="exchange" [(ngModel)]="newStock.exchange" required placeholder="Exchange" class="form-control" />
-      </div>
-      <div class="col-md-2">
-        <label>Image URL: </label>
-        <input type="text" name="imageUrl" [(ngModel)]="newStock.imageUrl" required placeholder="image Url" class="form-control" />
-      </div>
-      <div class="col-md-2">
-        <label>Sector: </label>
-        <input type="text" name="sector" [(ngModel)]="newStock.sector" required placeholder="Sector" class="form-control" />
-      </div>
-      <div class="col-md-2">
-        <label>Description: </label>
-        <input type="text" name="description" [(ngModel)]="newStock.description" required placeholder="description" class="form-control" />
-      </div>
-      <div class="col-md-3">
-        <label>IPO Quantity: </label>
-        <input type="number" name="ipoQty" [(ngModel)]="newStock.ipoQty" required placeholder="Initial Public Offering" class="form-control">
-      </div>
-      <div class="col-md-3">
-        <label>Initial Price: </label>
-        <input type="number" name="currentPrice" [(ngModel)]="newStock.currentPrice" required placeholder="Current Price" class="form-control" />
-      </div>
-    </div>
 
-    <div class="mt-3 d-flex justify-content-end gap-2">
-      <button type="submit" class="btn btn-primary" [disabled]="stockForm.invalid">Add</button>
-      <button type="button" class="btn btn-secondary" (click)="cancelAdd()">Cancel</button>
-    </div>
-  </form>
-</div>
+      <div class="mt-3 d-flex justify-content-end gap-2">
+        <button *ngIf="!editMode" type="submit" class="btn btn-primary" [disabled]="stockForm.invalid">Add</button>
+        <button *ngIf="editMode" type="submit" class="btn btn-primary" [disabled]="stockForm.invalid">Update</button>
+        <button type="button" class="btn btn-secondary" (click)="cancelAdd()">Cancel</button>
+      </div>
+    </form>
+  </div>
 
   <!-- Table -->
   <table class="table table-bordered table-hover" *ngIf="!loading && !error && stocks.length > 0">
@@ -95,8 +97,8 @@
           <td class="text-success fw-bold">₹{{ stock.currentPrice | number:'1.2-2' }}</td>
         <td>
           <!-- Your admin actions here -->
-          <button class="btn btn-warning btn-sm mb-2">Edit</button>
-          <button class="btn btn-danger btn-sm">Delete</button>
+          <button class="btn btn-warning btn-sm mb-2" (click)="editStock(stock)">Edit</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteStock(stock.id)">Delete</button>
         </td>
       </tr>
     </tbody>
