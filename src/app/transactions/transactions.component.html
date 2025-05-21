@@ -17,7 +17,8 @@
         /> -->
         <div>
           <h3>{{ txn.stock?.name }} ({{ txn.stock?.symbol }})</h3>
-          <p class="text-sm text-gray-500">{{ txn.stock?.sector }}</p>
+          <p class="text-sm text-gray-500"><strong>Sector: </strong>{{ txn.stock?.sector }} <br><strong>Timestamp:</strong>
+          {{ txn.timestamp | date: 'medium' }}</p>
         </div>
       </div>
 

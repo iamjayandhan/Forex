@@ -1,0 +1,205 @@
+<div class="container mt-4" *ngIf="stock">
+  <h3>Sell {{ stock.stock.name }} ({{ stock.stock.symbol }})</h3>
+
+  <div class="row mt-3">
+    <!-- Left Panel -->
+    <div class="col-md-8">
+      <div class="card p-3">
+        <div class="d-flex align-items-center mb-3">
+          <img [src]="stock.stock.imageUrl" width="60" height="60" class="border rounded me-3" />
+          <div>
+            <h5 class="mb-1">{{ stock.stock.name }}</h5>
+          </div>
+        </div>
+
+        <p><strong>Sector:</strong> {{ stock.stock.sector }}</p>
+        <p><strong>Current Market Price: </strong> ₹{{ stock.stock.currentPrice | number:'1.2-2' }}</p>
+        <p><strong>Avg price (Your holdings value): </strong>₹{{ stock.avgPrice }}</p>
+
+        <!-- <div class="mb-3">
+          <label for="quantity" class="form-label">Quantity</label>
+          <input type="number" id="quantity" (ngModelChange)="onQuantityChange($event)" [(ngModel)]="quantity" min="1" class="form-control w-auto" name="quantity"/>
+        </div> -->
+        <hr>
+        <h5>Note that Quantity cannot exceed your holdings </h5>
+
+        <h6 *ngIf="stock.stock.currentPrice - stock.avgPrice < 0" style="color: red;">It seems that sell computes to Loss!, Please proceed carefully.</h6>
+        <h6 *ngIf="stock.stock.currentPrice - stock.avgPrice > 0" style="color: green;">It seems that sell computes to Profit!, Consider selling more for more gains.</h6>
+        <h6 *ngIf="stock.stock.currentPrice - stock.avgPrice === 0" style="color: blue;">It seems like there is no gain or loss, anyway extra charges might apply.</h6>
+
+
+        <h6><strong>Your Current Holdings:</strong> {{ stock?.quantity }}</h6>
+        <hr>
+
+        <h5>Select number of Quantity</h5>
+        <div class="input-group w-25">
+            
+        <button class="btn btn-outline-secondary" type="button" (click)="decrementQty()">-</button>
+        
+        <input
+            type="number"
+            id="quantity"
+            [(ngModel)]="quantity"
+            (ngModelChange)="onQuantityChange($event)"
+            [min]="1"
+            [max]="stock?.quantity"
+            class="form-control text-center width-auto"
+            name="quantity"
+            readonly
+        />
+
+        <button
+            class="btn btn-outline-secondary"
+            type="button"
+            (click)="incrementQty()"
+            [disabled]="quantity >= stock?.quantity"
+        >+</button>
+        </div>
+
+        <br>
+        <h6>Total excluding charges:  ₹{{ subtotal | number:'1.2-2' }} - <span style="color: red;">Extra charges</span></h6>
+        <h6 style="color: blue;">*Please check bill summary for charge details</h6>
+
+        <div class="d-flex justify-content-start mt-3">
+          <button class="btn btn-success w-auto me-2"
+                  [disabled]="isQuantityInvalid"
+                  data-bs-toggle="modal"
+                  data-bs-target="#confirmModal">
+            Proceed to Sell
+          </button>
+          <button class="btn btn-secondary w-auto" (click)="router.navigate(['/portfolio'])">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Billing Summary -->
+    <div class="col-md-4 mt-4 mt-md-0">
+      <div class="card p-4" style="border: 1px dashed #6c757d; background-color: #f8f9fa;">
+        <h5 class="text-center mb-4">Billing Summary</h5>
+
+        <div class="d-flex justify-content-between mb-2">
+          <span>Stock</span>
+          <span>{{ stock.stock.name }} ({{ stock.stock.symbol }})</span>
+        </div>
+
+        <div class="d-flex justify-content-between mb-2">
+          <span>Price / Unit</span>
+          <span>₹{{ stock.stock.currentPrice | number:'1.2-2' }}</span>
+        </div>
+
+        <div class="d-flex justify-content-between mb-2">
+          <span>Quantity</span>
+          <span>{{ quantity }}</span>
+        </div>
+
+        <div *ngIf="isQuantityInvalid" class="text-danger fw-bold mt-3">
+          ⚠️ Please enter a valid quantity to view billing summary.
+        </div>
+
+        <hr />
+
+        <div class="d-flex justify-content-between mb-2">
+          <span>Subtotal</span>
+          <span>₹{{ subtotal | number:'1.2-2' }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>Brokerage (0.25%)</span>
+          <span>₹{{ brokerage | number:'1.2-2' }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>Exchange Txn Charges</span>
+          <span>₹{{ exchangeTxnCharges | number:'1.2-2' }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>Stamp Duty (NOT FOR SELL)</span>
+          <span>₹{{ stampDuty | number:'1.2-2' }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>IPFT</span>
+          <span>₹{{ ipft | number:'1.2-2' }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>SEBI Charges</span>
+          <span>₹{{ sebiCharges | number:'1.2-2' }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>STT (Securities Tax)</span>
+          <span>₹{{ stt | number:'1.2-2' }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>GST (18%)</span>
+          <span>₹{{ gst | number:'1.2-2' }}</span>
+        </div>
+
+        <hr />
+
+        <div class="d-flex justify-content-between fw-bold fs-5 mt-3">
+            <span>Total</span>
+            <span>₹{{ totalCost | number:'1.2-2' }}</span>
+        </div>
+        <div class="d-flex justify-content-between fs-10 mt-1">
+            <p>*Extra charges</p>
+            <p>₹{{extras | number:'1.2-2'}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Sell Order Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border border-success">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="confirmModalLabel">Confirm Sell Order</h5>
+        <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close" (click)="closeConfirmModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Stock:</strong> {{ stock.stock.name }} ({{ stock.stock.symbol }})</p>
+        <p><strong>Quantity:</strong> {{ quantity }}</p>
+        <p><strong>Price / Unit:</strong> ₹{{ stock.stock.currentPrice | number:'1.2-2' }}</p>
+        <hr>
+
+        <p><strong>Total excluding charges:</strong> ₹{{ subtotal | number:'1.2-2'}}     <small class="text-muted ms-2">*Charges might apply</small></p>         
+
+        <p><strong>Extra Charges:</strong> ₹{{ extras | number:'1.2-2'}}</p>
+
+        <p><strong>Total Cost:</strong> ₹{{ totalCost | number:'1.2-2' }}</p>
+        <hr>
+        <p><strong>Your Current Balance:</strong> ₹{{ user?.balance | number:'1.2-2' }} + <span style="color: green;"> ₹{{ totalCost | number:'1.2-2' }}</span></p>
+
+        <p style="color: green;">Funds will be transferred directly to your wallet, Kindly check balance after sell.</p>
+        <div class="mt-3">
+          <label for="mpinInput" class="form-label">Enter MPIN to confirm:</label>
+          <input
+            id="mpinInput"
+            type="password"
+            class="form-control"
+            [(ngModel)]="enteredMPIN"
+            maxlength="6"
+            placeholder="Enter your 6-digit MPIN"
+            [disabled]="isPlacingSellOrder"
+          />
+        </div>
+
+        <div *ngIf="mpinError" class="text-danger mt-2">
+          {{ mpinError }}
+        </div>
+        <div *ngIf="balanceError" class="text-danger mt-2">
+          {{ balanceError }}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeConfirmModal()" [disabled]="isPlacingSellOrder">Cancel</button>
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="isPlacingSellOrder"
+          (click)="handleModalConfirm()"
+        >
+          {{ isPlacingSellOrder ? 'Placing Order...' : 'Confirm Sell' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
