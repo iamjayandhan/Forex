@@ -12,15 +12,19 @@ import { TransactionsComponent } from './transactions/transactions.component';
 import { AdminComponent } from './admin/admin.component';
 import { HoldingsComponent } from './holdings/holdings.component';
 import { GuideComponent } from './guide/guide.component';
+import { SellComponent } from './sell/sell.component';
+import { ProfileComponent } from './profile/profile.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent , canActivate: [loggedInGuard]},
   { path: 'register', component:RegisterComponent, canActivate: [loggedInGuard]},
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard]},
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
   { path: 'resetPwd',component: OtpComponent},
   { path: 'market',  component: MarketComponent, canActivate:[AuthGuard]},
   { path: 'buy/:symbol', component:BuyComponent, canActivate:[AuthGuard]},
+  { path: 'sell/:stockId', component:SellComponent, canActivate:[AuthGuard]},
   { path: 'wallet',component: WalletComponent, canActivate:[AuthGuard]},
   { path: 'transactions/:userid',component:TransactionsComponent, canActivate:[AuthGuard]},
   { path: 'admin', component:AdminComponent, canActivate:[AuthGuard]},

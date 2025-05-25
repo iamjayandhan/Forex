@@ -6,11 +6,11 @@
   
     <!-- Search Bar -->
     <div class="mb-3">
-      <input type="text" class="form-control" placeholder="Search stocks..." [(ngModel)]="searchQuery" (input)="onSearch()">
+      <input type="text" class="form-control w-50" placeholder="search for a stock" [(ngModel)]="searchQuery" (input)="onSearch()">
     </div>
   
     <!-- Records Per Page -->
-    <div class="mb-3">
+    <div class="mb-3 w-50">
       <label>Records per page:</label>
       <select class="form-control" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
         <option [value]="10">10</option>

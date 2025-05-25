@@ -65,6 +65,16 @@ export class RegisterComponent {
   }
 
   onSubmit() {
+     if (!this.dateOfBirth) {
+      this.errorMsg = "Date of Birth is required.";
+      return;
+    }
+
+    if (this.dobInvalid()) {
+      this.errorMsg = "You must be at least 13 years old to register.";
+      return;
+    }
+
     if (this.username && this.email && this.password && this.fullName && this.mobileNumber && this.dateOfBirth && this.mpin) {
       // Make the API call through AuthService
       this.authService.register({
@@ -92,5 +102,14 @@ export class RegisterComponent {
       this.notyf.error("All fields are required.");
       this.errorMsg = 'All fields are required.';
     }
+  }
+
+  dobInvalid() {
+    const today = new Date();
+    const dob = new Date(this.dateOfBirth);
+    const age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    
+    return (age < 18 || (age === 18 && monthDiff < 0));
   }
 }

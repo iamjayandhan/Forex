@@ -21,7 +21,13 @@ export class WalletComponent implements OnInit {
   operationSuccess: boolean = false;
   currentWallet: number = 0;
 
+  //pagination state
   transactions : any[] = [];
+  currentPage: number = 0;
+  pageSize: number = 5;
+  pageSizeOptions: number[] = [5, 10, 20];
+  totalPages: number = 0;
+  totalItems: number = 0;
 
   constructor(
     private userService: UserService, 
@@ -34,7 +40,8 @@ export class WalletComponent implements OnInit {
       this.user = userData;
       if (this.user) {
         this.currentWallet = this.user.balance;
-        this.loadWalletTransactions();
+        // this.loadWalletTransactions();
+        this.loadWalletTransactionsPaginated(this.currentPage, this.pageSize);
       }
     });
 
@@ -58,6 +65,11 @@ export class WalletComponent implements OnInit {
       return;
     }
 
+    if(this.amount < 100){
+      this.notyf.error('Minimum amount for deposit/withdraw is ₹100.');
+      return;
+    }
+
     const payload = {
       email: this.user!.email,
       amount: this.amount,
@@ -71,6 +83,7 @@ export class WalletComponent implements OnInit {
           this.currentWallet = response.data.balance;
           this.operationSuccess = true;
           this.operationMessage = `${this.selectedOperation.charAt(0).toUpperCase() + this.selectedOperation.slice(1)} successful! Your new wallet balance is ₹${this.currentWallet}`;
+          this.amount = 0;
           this.notyf.success(this.operationMessage);
         },
         error: (err) => {
@@ -86,6 +99,7 @@ export class WalletComponent implements OnInit {
         userId: this.user!.userId,
         amount: this.amount,
         transactionType: this.selectedOperation.toUpperCase(),
+        transactionReason: 'SELF',
         balance: isDeposit ? 
         this.currentWallet + this.amount :
         this.currentWallet - this.amount,
@@ -96,7 +110,7 @@ export class WalletComponent implements OnInit {
       this.portfolioService.saveWalletTransaction(transactionPayload).subscribe({
         next: (response) => {
           console.log("Transaction saved successfully:", response);
-          this.loadWalletTransactions(); // Reload transactions after saving
+          this.loadWalletTransactionsPaginated(this.currentPage, this.pageSize); // Reload transactions after saving
         },
         error: (err) => {
           console.error("Error saving transaction:", err);
@@ -104,20 +118,53 @@ export class WalletComponent implements OnInit {
       })
   }
 
-  loadWalletTransactions(): void {
-  this.portfolioService.getWalletTransactions(this.user!.userId).subscribe({
-    next: (res) => {
-      if (res && res.status === 200 && res.data) {
-        this.transactions = res.data;
-        console.log("Transactions loaded successfully:", this.transactions);
-      }
-    },
-    error: (err) => {
-      console.error("Failed to load transactions", err);
-    }
-  });
-}
+//   loadWalletTransactions(): void {
+//   this.portfolioService.getWalletTransactions(this.user!.userId).subscribe({
+//     next: (res) => {
+//       if (res && res.status === 200 && res.data) {
+//         this.transactions = res.data;
+//       }
+//     },
+//     error: (err) => {
+//       console.error("Failed to load transactions", err);
+//     }
+//   });
+// }
+  onPageSizeChange(){
+    this.loadWalletTransactionsPaginated(this.currentPage, this.pageSize);
+  }
 
+  loadWalletTransactionsPaginated(page: number, pageSize: number): void {
+    if(!this.user) return;
+
+    this.portfolioService.getWalletTransactionsPaginated(this.user.userId, page, pageSize).subscribe({
+      next: (res) => {
+          if (res && res.status === 200 && res.data) {
+            this.transactions = res.data.transactions;
+            this.currentPage = res.data.currentPage;
+            this.totalPages = res.data.totalPages;
+            this.totalItems = res.data.totalItems;
+          }
+        },
+        error: (err) => {
+          console.error("Failed to load paginated transactions", err);
+        }
+    })
+  }
+
+  goToPreviousPage(): void {
+    if(this.currentPage > 0){
+      this.loadWalletTransactionsPaginated(this.currentPage - 1, this.pageSize);
+      this.currentPage--;
+    }
+  }
+
+  goToNextPage(): void {
+    if(this.currentPage < this.totalPages - 1){
+      this.loadWalletTransactionsPaginated(this.currentPage + 1, this.pageSize);
+      this.currentPage++;
+    }
+  }
 
   // Check if the amount is valid
   get isAmountInvalid(): boolean {
@@ -129,6 +176,6 @@ export class WalletComponent implements OnInit {
   }
 
   get isAmountValid(): boolean {
-    return this.amount > 0;
+    return this.amount > 100;
   }
 }

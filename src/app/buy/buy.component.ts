@@ -34,14 +34,14 @@ export class BuyComponent implements OnInit {
   ) {
     const navigation = this.router.getCurrentNavigation();
     this.stock = navigation?.extras?.state?.['stock'];
+
+    // console.log("stock data for buy:", this.stock);
   }
 
   ngOnInit(): void {
-
-    //listen to user data changes
     this.userService.currentUser$.subscribe((userData) => {
       this.user = userData;
-      console.log("user acc info for purchase:",userData);
+      // console.log("user acc info for purchase:",userData);
     });
 
     // Fetch user data if not already set
@@ -56,8 +56,24 @@ export class BuyComponent implements OnInit {
     if (value < 1 || !Number.isInteger(value)) {
       this.notyf.error('Quantity must be a positive integer');
       this.quantity = 1;
-    } else {
+    }
+    else if (value > this.stock.ipoQty) {
+      this.notyf.error('Quantity exceeds available stock');
+      this.quantity = this.stock.ipoQty;
+    } 
+    else {
       this.quantity = Math.floor(value);
+    }
+  }
+
+  incrementQty(){
+    if(this.quantity < this.stock.ipoQty){
+      this.quantity++;
+    }
+  }
+  decrementQty(){
+    if(this.quantity > 1){
+      this.quantity--;
     }
   }
 
@@ -97,6 +113,11 @@ export class BuyComponent implements OnInit {
     this.enteredMPIN = '';
     this.mpinError = '';
     this.balanceError = '';
+    
+    // const backdrop = document.querySelector('.modal-backdrop');
+    // if (backdrop) {
+    //   backdrop.remove();
+    // }
   }
 
   confirmBuyOrder() {
@@ -121,12 +142,13 @@ export class BuyComponent implements OnInit {
     avgPrice: this.stock.currentPrice,
   };
 
+
   this.portfolioService.placeBuyOrder(orderPayload).subscribe({
     next: (response) => {
       this.isPlacingOrder = false;
       this.closeConfirmModal();
       this.notyf.success(response.message);
-      this.router.navigate(['/dashboard']); 
+      this.router.navigate(['/portfolio']); 
     },
     error: (error) => {
       this.isPlacingOrder = false;
@@ -134,6 +156,25 @@ export class BuyComponent implements OnInit {
       console.error(error);
     }
   });
+
+  console.log("User balance: ",this.user!.balance - this.totalCost);
+
+  const transactionPayload = {
+    userId: this.user!.userId,
+    amount: this.totalCost,
+    transactionType: 'WITHDRAW',
+    transactionReason: 'STOCK_PURCHASE',
+    balance: this.user!.balance - this.totalCost,
+  };
+
+  this.portfolioService.saveWalletTransaction(transactionPayload).subscribe({
+    next : (response)=>{
+      console.log(response);
+    },
+    error : (err)=>{
+      console.log(err);
+    }
+  })
 }
 
   //valid qty check
@@ -151,7 +192,8 @@ export class BuyComponent implements OnInit {
 
   //Brokerage = 0.25% of subtotal
   get brokerage(): number { 
-    return +(this.subtotal * 0.0025).toFixed(2); //0.25%
+    const calculated = +(this.subtotal * 0.0025).toFixed(2); //0.25%
+    return Math.min(calculated,20);
   }
 
   //2. External charges:
@@ -218,5 +260,9 @@ export class BuyComponent implements OnInit {
       this.stt +
       this.gst
     ).toFixed(2);
+  }
+
+  stockNotAvailable() {
+    return this.stock?.ipoQty === 0;
   }
 }

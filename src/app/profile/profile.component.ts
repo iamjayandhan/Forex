@@ -1,9 +1,10 @@
-import { Component, Input,Output,EventEmitter, OnChanges,SimpleChanges } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { Component, Input,Output,EventEmitter, OnChanges,SimpleChanges, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NotyfService } from '../services/notyf.service';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../services/user.service';
+import { UserProfile } from '../models/user-profile.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -12,39 +13,45 @@ import { UserService } from '../services/user.service';
   standalone:true,
   imports:[CommonModule,ReactiveFormsModule]
 })
-export class ProfileComponent implements OnChanges{
-  @Input() user: any; // user info from parent (navbar)
-  @Output() close = new EventEmitter<void>();
+export class ProfileComponent implements OnInit{
 
   profileForm: FormGroup;
   showModal = false;
+  user: UserProfile | null = null;
 
   constructor(
     private fb: FormBuilder, 
     private notyf: NotyfService,
-    private userService: UserService
+    private userService: UserService,
+    private router: Router
   ) {
     this.profileForm = this.fb.group({
       email: [{ value: '', disabled: true }],
-      fullName: [''],
-      mobileNumber: [''],
-      dateOfBirth: ['']
+      fullName: ['',Validators.required],
+      mobileNumber: ['',[Validators.required, Validators.pattern('^[1-9][0-9]{9}$')]],
+      dateOfBirth: ['', Validators.required],
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void{
-    if(changes['user'] && this.user){
-      this.openModal(this.user);
+  ngOnInit(): void {
+    this.userService.currentUser$.subscribe((userData) => {
+      if (userData) {
+        this.user = userData;
+        this.profileForm.patchValue({
+          email: userData.email,
+          fullName: userData.fullName,
+          mobileNumber: userData.mobileNumber,
+          dateOfBirth: userData.dateOfBirth
+        });
+      }
+    });
+
+    // Fetch if user data is not already available
+    if (!this.userService.getUser()) {
+      this.userService.getUserProfile().subscribe((data) => {
+        this.userService.setUser(data);
+      });
     }
-  }
-
-  openModal(user: any) {
-    this.showModal = true;
-    this.profileForm.patchValue(user);
-  }
-
-  closeModal() {
-    this.showModal = false;
   }
 
   onSubmit() {
@@ -55,14 +62,20 @@ export class ProfileComponent implements OnChanges{
       dateOfBirth: this.profileForm.value.dateOfBirth
     };
 
+    console.log("Payload for update:", payload);
+
     this.userService.updateUserProfile(payload).subscribe({
       next: () => {
-        this.notyf.success("Profile updated successfully!");
-        this.closeModal();
+        // this.notyf.success("Profile updated successfully!");
       },
       error: (err) =>{
         this.notyf.error(err);
       },
     })
+  }
+
+  onCancel() {
+    this.showModal = false;
+    this.router.navigate(['/portfolio']);
   }
 }

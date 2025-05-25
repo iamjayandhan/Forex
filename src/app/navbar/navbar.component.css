@@ -1,0 +1,21 @@
+.navbar-nav .nav-link {
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  margin: 5px 5px;
+}
+
+.navbar-nav .nav-link.active {
+  background-color: #27b114;
+  color: white !important;
+  border-radius: 5px;
+  /* padding: 5px 10px; */
+}
+
+.navbar-nav .nav-link:not(.active):hover {
+  background-color: #e0e0e0;
+  border-radius: 5px;
+}
+
+.navbar-brand {
+  cursor: pointer;
+}

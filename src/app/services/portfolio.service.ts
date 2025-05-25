@@ -11,6 +11,7 @@ export class PortfolioService {
 
   constructor(private http: HttpClient) { }
 
+  // GET: Buy a stock
   placeBuyOrder(orderPayload: any): Observable<any> {
     return this.http.post(`${environment.apiUrl}/portfolio/buy`,orderPayload,{ withCredentials: true})
     .pipe(
@@ -21,6 +22,7 @@ export class PortfolioService {
     );
   }
 
+  // GET: Sell a stock
   placeSellOrder(orderPayload: any): Observable<any> {
     return this.http.post(`${environment.apiUrl}/portfolio/sell`,orderPayload,{ withCredentials: true})
     .pipe(
@@ -31,6 +33,7 @@ export class PortfolioService {
     );
   }
 
+  // GET: Fetch all transactions
   getTransactions(userId : number): Observable<any> {
     return this.http.get(`${environment.apiUrl}/portfolio/transactions/${userId}`,{withCredentials:true})
     .pipe(
@@ -41,6 +44,19 @@ export class PortfolioService {
     )
   }
 
+  // GET: Fetch paginated transactions
+  getTransactionsPaginated(userId: number, page: number, pageSize: number): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/portfolio/transactions/paginated?page=${page}&size=${pageSize}&userId=${userId}`, {
+      withCredentials: true,
+    }).pipe(
+      catchError((error) => {
+        console.error("Error fetching paginated transactions", error);
+        throw error;
+      })
+    );
+  }
+
+  // GET: Fetch all holdings
   getHoldings(userId : number): Observable<any>{
     return this.http.get(`${environment.apiUrl}/portfolio/holdings/${userId}`,{withCredentials:true})
     .pipe(
@@ -51,6 +67,7 @@ export class PortfolioService {
     )
   }
 
+  // GET: Fetch paginated holdings
   getHoldingsPaginated(userId: number, page: number, pageSize: number): Observable<any> {
     // console.log(`Fetching paginated holdings for userId: ${userId}, page: ${page}, pageSize: ${pageSize}`);
     return this.http.get(`${environment.apiUrl}/portfolio/holdings/paginated?page=${page}&size=${pageSize}&userId=${userId}`, {
@@ -63,6 +80,7 @@ export class PortfolioService {
     );
   }
 
+  // POST: Save wallet transaction
   saveWalletTransaction(transactionPayload: any): Observable<any> {
     return this.http.post(`${environment.apiUrl}/portfolio/wallet`, transactionPayload, { withCredentials: true })
       .pipe(
@@ -73,6 +91,7 @@ export class PortfolioService {
       );
   }
 
+  // GET: Fetch wallet transactions
   getWalletTransactions(userId: number): Observable<any> {
     return this.http.get(`${environment.apiUrl}/portfolio/wallet/${userId}`, { withCredentials: true })
       .pipe(
@@ -81,6 +100,17 @@ export class PortfolioService {
           throw error;
         })
       );
+  }
+
+  getWalletTransactionsPaginated(userId: number, page: number, pageSize: number): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/portfolio/wallet/paginated?page=${page}&size=${pageSize}&userId=${userId}`, {
+      withCredentials: true,
+    }).pipe(
+      catchError((error) => {
+        console.error("Error fetching paginated wallet transactions", error);
+        throw error;
+      })
+    );
   }
 
 }

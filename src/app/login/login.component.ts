@@ -36,15 +36,15 @@ export class LoginComponent {
       this.authService.login({ email: this.email, password: this.password }).subscribe({
         next: (res) => {
           if (res && res.data.token) {
-              console.log(res);
-              console.log(res.data.token);
+              // console.log(res);
+              // console.log(res.data.token);
               // Fetch the updated user profile after login
               this.userService.getUserProfile().subscribe(response => {
                 const userData = response.data;
                 this.userService.setUser(userData);  // Store the user data in BehaviorSubject
 
-                console.log("User profile: ", userData);
-                console.log("going to dashboard!");
+                // console.log("User profile: ", userData);
+                // console.log("going to dashboard!");
 
                 this.notyf.success("Login success!");
                 this.router.navigate(['/dashboard']);

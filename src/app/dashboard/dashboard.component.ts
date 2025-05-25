@@ -1,9 +1,12 @@
-import { Component,OnInit } from '@angular/core';
+import { Component,OnInit,OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';  // Import AuthService
 import { UserService } from '../services/user.service';
 import { UserProfile } from '../models/user-profile.model';
 import { CommonModule } from '@angular/common';
+
+import { takeUntil, tap, switchMap } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,24 +15,28 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports:[CommonModule]
 })
-export class DashboardComponent implements OnInit{
+export class DashboardComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   user: UserProfile | null = null;
 
   constructor(private authService: AuthService, private router: Router,private userService:UserService) {}
 
   ngOnInit(): void {
-      this.userService.getUserProfile().subscribe({
-        next: (response)=>{
-          console.log("user data fetched: ",response.data);
-          this.userService.setUser(response.data);
-        },
-        error: (err) =>{
-            console.log("Error fetching user profile!",err);
-        },
-      })
-      this.userService.currentUser$.subscribe(user => {
-        this.user = user;
-      })
+    this.userService.getUserProfile().pipe(
+      //Used tap() to update the BehaviorSubject only after receiving the user data.
+      tap(response => this.userService.setUser(response.data)),
+      //Chained with switchMap() to subscribe to currentUser$ only after the update.
+      switchMap(() => this.userService.currentUser$),
+      //Included takeUntil() for memory safety when the component is destroyed.
+      takeUntil(this.destroy$)
+    ).subscribe(user => {
+      this.user = user;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   logout() {

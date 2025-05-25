@@ -78,6 +78,23 @@ export class AdminComponent implements OnInit {
       this.notyf.error("Please fill required fields.");
       return;
     }
+
+    if(this.newStock.ipoQty <= 0){
+      this.notyf.error("IPO quantity must be greater than 0");
+      return;
+    }
+    if(this.newStock.currentPrice <= 0){
+      this.notyf.error("Current price must be greater than 0");
+      return;
+    }
+    if(this.newStock.symbol.length < 3){
+      this.notyf.error("Symbol must be at least 3 characters long");
+      return;
+    }
+    if(this.newStock.name.length < 3){
+      this.notyf.error("Name must be at least 3 characters long");
+      return;
+    }
     
     let payload = {
       name: this.newStock.name,
@@ -95,12 +112,20 @@ export class AdminComponent implements OnInit {
         this.notyf.success('Stock added successfully');
         this.fetchStocks();
       },
-      error: () => {
-        this.error = 'Failed to add stock';
-        this.notyf.error(this.error);
+      error: (err) => {
+        // console.error(err);
+
+        if (err?.message?.includes('Duplicate entry') && err?.message?.includes('unique_symbol')) {
+          this.notyf.error('A stock with this symbol already exists. Please choose a unique symbol.');
+        } else {
+          this.notyf.error('Failed to add stock. Please try again later.');
+        }
+
+        // this.error = 'An error occurred while adding the stock.';
       }
+
     });
-    
+  
     this.resetStockInfo();
     this.showForm = false;
   }

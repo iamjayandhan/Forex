@@ -4,28 +4,25 @@ import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { UserProfile } from '../models/user-profile.model';
 import { CommonModule } from '@angular/common';
-import { ProfileComponent } from '../profile/profile.component';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
   standalone: true,
-  imports: [CommonModule,ProfileComponent]
+  imports: [CommonModule]
 })
 export class NavbarComponent implements OnInit {
   user: UserProfile | null = null;
   dropdownOpen = false;
-  showProfileModel = false;
+
+  activeRoute: string = 'dashboard';
 
   constructor(private userService: UserService, private authService: AuthService, private router: Router) {}
 
   viewProfile(){
-    this.showProfileModel = true;
-  }
-
-  closeProfile(){
-    this.showProfileModel = false;
+    // this.showProfileModel = true;
+    this.router.navigate(['/profile']);
   }
 
   ngOnInit(): void {
@@ -50,6 +47,12 @@ export class NavbarComponent implements OnInit {
   }
 
   navigateTo(route: string): void {
-    this.router.navigate([route]);
+    this.activeRoute = route;
+    
+    if(route === "transactions"){
+      this.router.navigate([`transactions/${this.user?.userId}`]);
+    }else{
+      this.router.navigate([route]);
+    }
   }
 }

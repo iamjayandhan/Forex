@@ -17,7 +17,7 @@
         </div>
 
         <hr>
-        <h6 style="color: blue;">*Limit: Max 10k/transaction</h6>
+        <h6 class="text-muted">*Limit: min.₹100 & max.10k per transaction</h6>
         <div class="mb-3">
           <label for="amount" class="form-label">Amount</label>
           <input type="number" id="amount" [(ngModel)]="amount" class="form-control" placeholder="Enter amount" min="0" max="10000" />
@@ -40,26 +40,35 @@
   <!-- Wallet Transactions List -->
   <div class="col-md-12 mt-5 mb-5">
     <div class="card p-3 mx-auto" style="max-width: 1111px; width: 100%;">
-      <h5 class="mb-3">Transaction History</h5>
+      <h3 class="mb-3">Transaction History</h3>
+
+      <div class="d-flex justify-content-end align-items-center mb-3 gap-2">
+      <label for="pageSize" class="form-label mb-0">Rows per page:</label>
+      <select id="pageSize" class="form-select w-auto" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+        <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+      </select>
+    </div>
 
       <div *ngIf="transactions.length > 0; else noTransactions">
         <table class="table table-bordered table-striped w-100">
         <thead class="table-light">
           <tr>
-            <th style="width: 5%;">S.no</th>
-            <th style="width: 15%;">Type</th>
-            <th style="width: 20%;">Amount (₹)</th>
-            <th style="width: 25%;">Balance</th>
-            <th style="width: 35%;">Time</th>
+            <th style="width: 5%;">#</th>
+            <th style="width: 20%;">Transaction Type</th>
+            <th style="width: 20%;">Transaction Reason</th>
+            <th style="width: 15%;">Amount</th>
+            <th style="width: 20%;">Updated Balance</th>
+            <th style="width: 35%;">Date & Time</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let txn of transactions; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ txn.transactionType }}</td>
+            <td>{{ txn.transactionReason }}</td>
             <td>{{ txn.amount | number:'1.2-2' }}</td>
             <td>{{ txn.balance | number:'1.2-2' }}</td>
-            <td style="white-space: nowrap;">{{ txn.createdAt | date: 'short' }}</td>
+            <td style="white-space: nowrap;">{{ txn.createdAt | date: 'MMM d, y, h:mm a' }}</td>
           </tr>
         </tbody>
       </table>
@@ -68,6 +77,18 @@
       <ng-template #noTransactions>
         <p class="text-muted">No wallet transactions found.</p>
       </ng-template>
+
+      <div class="pagination-controls d-flex justify-content-center align-items-center mt-3 gap-2">
+        <button class="btn btn-outline-primary" (click)="goToPreviousPage()" [disabled]="currentPage === 0">
+          Previous
+        </button>
+        <span class="mx-2 text-secondary">
+          Page {{ currentPage + 1 }} of {{ totalPages }}
+        </span>
+        <button class="btn btn-outline-primary" (click)="goToNextPage()" [disabled]="currentPage === totalPages - 1">
+          Next
+        </button>
+      </div>
     </div>
   </div>
 </div>

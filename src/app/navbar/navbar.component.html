@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light position-sticky" style="z-index: 1000; top: 0;">
     <div class="container-fluid">
       <!-- Logo and Navbar Links -->
       <a class="navbar-brand" (click)="navigateTo('dashboard')">ForexTrader</a>
@@ -10,25 +10,25 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link" (click)="navigateTo('dashboard')">Dashboard</a>
+            <a class="nav-link" [ngClass]="{ 'active': activeRoute === 'dashboard' }" (click)="navigateTo('dashboard')">Dashboard</a>
           </li>
-          <li class="nav-item" *ngIf="user?.role === 'ADMIN'">
+          <li class="nav-item"  [ngClass]="{ 'active': activeRoute === 'admin' }" *ngIf="user?.role === 'ADMIN'">
             <a class="nav-link" (click)="navigateTo('admin')">Admin</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" (click)="navigateTo('market')">Market</a>
+            <a class="nav-link" [ngClass]="{ 'active': activeRoute === 'market' }" (click)="navigateTo('market')">Market</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" (click)="navigateTo('portfolio')">My Portfolio</a>
+            <a class="nav-link" [ngClass]="{ 'active': activeRoute === 'portfolio' }" (click)="navigateTo('portfolio')">My Portfolio</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" (click)="navigateTo('transactions')">Transactions</a>
+            <a class="nav-link" [ngClass]="{ 'active': activeRoute === 'transactions' }" (click)="navigateTo('transactions')">Transactions</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" (click)="navigateTo('wallet')">Deposit/Withdraw</a>
+            <a class="nav-link" [ngClass]="{ 'active': activeRoute === 'wallet' }" (click)="navigateTo('wallet')">Deposit/Withdraw</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" (click)="navigateTo('help')">Help</a>
+            <a class="nav-link" [ngClass]="{ 'active': activeRoute === 'help' }" (click)="navigateTo('help')">Help</a>
           </li>
         </ul>
       </div>
@@ -58,6 +58,9 @@
             <li *ngIf="user" class="dropdown-item">
               <strong>Role:</strong> {{ user.role }}
             </li>
+            <li *ngIf="user" class="dropdown-item">
+              <strong>Balance:</strong> {{ user.balance }}
+            </li>
             <li>
                 <button class="dropdown-item" (click)="viewProfile()">View profile</button>
             </li>
@@ -70,5 +73,3 @@
       </div>
     </div>
   </nav>
-  
-  <app-profile *ngIf="showProfileModel" [user]="user" (close)="closeProfile()"></app-profile>

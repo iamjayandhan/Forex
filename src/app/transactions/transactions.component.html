@@ -1,50 +1,116 @@
-<div class="container mx-auto p-4">
-  <h2 class="text-2xl font-bold mb-4">Portfolio Transactions</h2>
+<div class="container mt-4 mb-5">
+  <h3 class="mb-4">Portfolio Transactions</h3>
 
-  <div *ngIf="transactions.length > 0; else noTransactions">
+   <!-- Toggle Buttons -->
+  <div class="mb-3 d-flex gap-2">
+    <button class="btn" 
+            [class.btn-primary]="selectedType === 'all'" 
+            (click)="selectedType = 'all'">All</button>
+    <button class="btn" 
+            [class.btn-success]="selectedType === 'buy'" 
+            (click)="selectedType = 'buy'">Buy</button>
+    <button class="btn" 
+            [class.btn-danger]="selectedType === 'sell'" 
+            (click)="selectedType = 'sell'">Sell</button>
+  </div>
+
+  <!-- Search Input -->
+  <div class="mb-4">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Search by name, symbol, or type"
+      [(ngModel)]="searchQuery"
+    />
+  </div>
+
+
+  <div *ngIf="filteredAndPaginatedTransactions.length > 0; else noTransactions">
     <div
-      *ngFor="let txn of transactions"
+      *ngFor="let txn of filteredAndPaginatedTransactions"
+      class="card mb-3 shadow-sm"
+      [ngClass]="{ 'border-primary': selectedTransaction === txn }"
       (click)="toggleDetails(txn)"
-      [class.selected]="selectedTransaction === txn"
-      class="border p-3 mb-3 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
+      style="cursor: pointer;"
     >
-      <!-- Summary info -->
-      <div class="flex items-center gap-4 mb-2">
-        <!-- <img
-          [src]="txn.stock?.imageUrl"
-          [alt]="txn.stock?.name"
-          class="w-12 h-12 object-contain"
-        /> -->
-        <div>
-          <h3>{{ txn.stock?.name }} ({{ txn.stock?.symbol }})</h3>
-          <p class="text-sm text-gray-500"><strong>Sector: </strong>{{ txn.stock?.sector }} <br><strong>Timestamp:</strong>
-          {{ txn.timestamp | date: 'medium' }}</p>
-        </div>
-      </div>
+      <div class="card-body">
+        <!-- Sum  mary Row -->
+        <div class="d-flex align-items-start justify-content-between">
+          <div>
+            <img [src]="txn.stock?.imageUrl" alt="{{ txn.name }} Logo" style="object-fit: contain;" width="50" height="50" class="me-2 rounded border">
 
-      <!-- Details shown only if selected -->
-      <div *ngIf="selectedTransaction === txn" class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm d-flex">
-        <p><strong>Type:</strong> {{ txn.transactionType }}</p>
-        <p><strong>Quantity:</strong> {{ txn.quantity }}</p>
-        <p><strong>Price/Unit:</strong> ₹{{ txn.pricePerUnit }}</p>
-        <p><strong>Subtotal:</strong> ₹{{ txn.subTotal }}</p>
-        <p><strong>Brokerage:</strong> ₹{{ txn.brokerage }}</p>
-        <p><strong>Exchange Charges:</strong> ₹{{ txn.exchangeTxnCharges }}</p>
-        <p><strong>Stamp Duty:</strong> ₹{{ txn.stampDuty }}</p>
-        <p><strong>IPFT:</strong> ₹{{ txn.ipft }}</p>
-        <p><strong>SEBI Charges:</strong> ₹{{ txn.sebiCharges }}</p>
-        <p><strong>STT:</strong> ₹{{ txn.stt }}</p>
-        <p><strong>GST:</strong> ₹{{ txn.gst }}</p>
-        <p><strong>Total Amount:</strong> ₹{{ txn.totalAmount }}</p>
-        <p class="col-span-full">
-          <strong>Timestamp:</strong>
-          {{ txn.timestamp | date: 'medium' }}
-        </p>
+            <h5 class="card-title mb-1">{{ txn.stock?.name }} ({{ txn.stock?.symbol }})</h5>
+            <p class="text-muted mb-0">
+              <strong>Sector:</strong> {{ txn.stock?.sector }}
+            </p>
+            <p class="text-muted mb-0">
+              <strong>Transaction Type:</strong> {{ txn.transactionType }} 
+            </p>
+            <p class="text-muted mb-0">
+              <strong>Quantity:</strong> {{ txn.quantity }}
+            </p>
+            <p class="text-muted mb-0">
+              <strong>Total Amount:</strong> ₹{{ txn.totalAmount | number: '1.2-2' }}
+            </p>
+            <p class="text-muted mb-0">
+              <strong>Date & Time:</strong> {{ txn.timestamp | date: 'MMM d, y, h:mm a' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Expanded Details -->
+        <div *ngIf="selectedTransaction === txn" class="mt-3">
+          <div class="row">
+            <hr>
+            <div class="col-12 text-muted"><strong>Price/Unit:</strong> ₹{{ txn.pricePerUnit }}</div>
+            <div class="col-12 text-muted"><strong>Subtotal (Quantity x Price/Unit):</strong> ₹{{ txn.subTotal }}</div>
+
+             <div class="col-12 mt-3 text-muted">
+              <strong>Total Amount: (SubTotal + Charges)</strong><br />
+              ₹{{ txn.subTotal }} + ₹{{ txn.brokerage }} (Brokerage)+ ₹{{ txn.exchangeTxnCharges }} (Exchange Charges)
+              <span *ngIf="txn.transactionType === 'BUY'"> + ₹{{ txn.stampDuty }} (Stamp Duty)</span>
+              <span *ngIf="txn.transactionType === 'SELL'" class="text-danger"> + ₹{{ txn.stampDuty }} (Stamp Duty excluded)</span>
+              + ₹{{ txn.ipft }} (IPFT) + ₹{{ txn.sebiCharges }} (SEBI Charges) + ₹{{ txn.stt }} (STT)+ ₹{{ txn.gst }} (GST) =
+              <strong> ₹{{ txn.totalAmount }}</strong>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- No Transactions -->
   <ng-template #noTransactions>
-    <p class="text-center text-gray-500">No transactions found.</p>
+    <p class="text-center text-muted">No portfolio transactions found.</p>
   </ng-template>
+
+  <nav *ngIf="totalPages > 1" class="d-flex justify-content-center mt-4">
+    <ul class="pagination">
+      
+      <!-- Previous button -->
+      <li class="page-item" [class.disabled]="currentPage === 0">
+        <button class="page-link" (click)="currentPage = currentPage - 1" 
+                [disabled]="currentPage === 0">
+          Previous
+        </button>
+      </li>
+
+      <!-- Current page (1-based index) -->
+      <li class="page-item active">
+        <span class="page-link">
+          {{ currentPage + 1 }}
+        </span>
+      </li>
+
+      <!-- Next button -->
+      <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+        <button class="page-link" (click)="currentPage = currentPage + 1" 
+                [disabled]="currentPage >= totalPages - 1">
+          Next
+        </button>
+      </li>
+
+    </ul>
+  </nav>
+
 </div>

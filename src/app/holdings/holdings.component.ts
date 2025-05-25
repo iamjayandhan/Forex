@@ -5,6 +5,7 @@ import { PortfolioService } from '../services/portfolio.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserProfile } from '../models/user-profile.model';
+import { Router } from '@angular/router';
 
 interface StockInfo {
   name: string;
@@ -36,6 +37,7 @@ export class HoldingsComponent implements OnInit {
 
   user: UserProfile | null = null;
   userId: number | null = null;
+  userEmail: string | '' = '';
   holdings: Holding[] = [];
 
   loading = true;
@@ -54,7 +56,8 @@ export class HoldingsComponent implements OnInit {
   constructor(
     private userService: UserService,
     private notyf: NotyfService,
-    private portfolioService: PortfolioService
+    private portfolioService: PortfolioService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -64,11 +67,12 @@ export class HoldingsComponent implements OnInit {
   loadUser(): void {
     this.userService.currentUser$.subscribe((userData) => {
       this.user = userData;
+      this.userEmail = this.user?.email || '';
+
       if(this.user){
         this.userId = this.user.userId;
         this.loadHoldings(this.user.userId,this.currentPage, this.pageSize);
 
-        console.log("User ID: ", this.userId);
         this.portfolioService.getHoldings(this.userId).subscribe((response) => {
         this.totalInvested = response.data.reduce((sum : number ,h : Holding) => sum + (h.avgPrice * h.quantity),0).toFixed(2);
         this.totalProfitLoss = response.data.reduce((sum : number ,h : Holding) => sum + ((h.stock.currentPrice - h.avgPrice) * h.quantity),0).toFixed(2);
@@ -88,7 +92,6 @@ export class HoldingsComponent implements OnInit {
   loadHoldings(userId: number,page: number, size:number) {
     this.portfolioService.getHoldingsPaginated(userId,page,size).subscribe({
       next: (res) => {
-        console.log(res.data.content);
         this.holdings = res.data.content.map((holding: Holding) => {
           const profitLossAmount = (holding.stock.currentPrice - holding.avgPrice) * holding.quantity;
           const profitLossPercent = ((holding.stock.currentPrice - holding.avgPrice) / holding.avgPrice) * 100;
@@ -104,13 +107,10 @@ export class HoldingsComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        this.notyf.error("Error fetching holdings");
         console.error(err);
       }
     });
   }
-
-
 
   onSearch(): void {
     this.currentPage = 0;
@@ -134,5 +134,14 @@ export class HoldingsComponent implements OnInit {
 
   get totalPages(): number {
     return Math.ceil(this.totalRecords / this.pageSize);
+  }
+
+  goToSell(holding: Holding): void {
+    console.log("goToSell: ",holding);
+    this.router.navigate(['/sell', holding.stockId], { state: { holding } });
+  }
+  
+  isNeutral() : boolean{
+    return Math.abs(this.totalProfitLoss) < 0.01;
   }
 }

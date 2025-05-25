@@ -174,6 +174,23 @@ export class SellComponent implements OnInit {
       console.error(error);
     }
   });
+
+    const transactionPayload = {
+    userId: this.user!.userId,
+    amount: this.totalCost,
+    transactionType: 'DEPOSIT',
+    transactionReason: 'STOCK_SELL',
+    balance: this.user!.balance + this.totalCost,
+  };
+
+  this.portfolioService.saveWalletTransaction(transactionPayload).subscribe({
+    next : (response)=>{
+      console.log(response);
+    },
+    error : (err)=>{
+      console.log(err);
+    }
+  })
 }
 
   //valid qty check
