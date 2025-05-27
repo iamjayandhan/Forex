@@ -6,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserProfile } from '../models/user-profile.model';
 import { Router } from '@angular/router';
+import { DonutChartComponent } from '../donut-chart/donut-chart.component';
+import { BarChartComponent } from '../bar-chart/bar-chart.component';
 
 interface StockInfo {
   name: string;
@@ -31,7 +33,7 @@ interface Holding {
   templateUrl: './holdings.component.html',
   styleUrls: ['./holdings.component.css'],
   standalone: true,
-  imports: [CommonModule,FormsModule]
+  imports: [CommonModule,FormsModule,DonutChartComponent, BarChartComponent]
 })
 export class HoldingsComponent implements OnInit {
 
@@ -42,6 +44,9 @@ export class HoldingsComponent implements OnInit {
 
   loading = true;
   error: string | null = null;
+
+  sortBy: string = 'id';
+  sortOrder: string = 'asc';
 
   searchQuery: string = '';
   pageSize: number = 5;
@@ -89,8 +94,19 @@ export class HoldingsComponent implements OnInit {
     });
   }
 
+  onSort(column: string) {
+    if (this.sortBy === column) {
+      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = column;
+      this.sortOrder = 'asc';
+    }
+
+    this.loadHoldings(this.userId!, this.currentPage, this.pageSize);
+  }
+
   loadHoldings(userId: number,page: number, size:number) {
-    this.portfolioService.getHoldingsPaginated(userId,page,size).subscribe({
+    this.portfolioService.getHoldingsPaginated(userId,page,size,this.sortBy,this.sortOrder).subscribe({
       next: (res) => {
         this.holdings = res.data.content.map((holding: Holding) => {
           const profitLossAmount = (holding.stock.currentPrice - holding.avgPrice) * holding.quantity;

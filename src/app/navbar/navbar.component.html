@@ -1,75 +1,68 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light position-sticky" style="z-index: 1000; top: 0;">
-    <div class="container-fluid">
-      <!-- Logo and Navbar Links -->
-      <a class="navbar-brand" (click)="navigateTo('dashboard')">ForexTrader</a>
-  
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-  
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" [ngClass]="{ 'active': activeRoute === 'dashboard' }" (click)="navigateTo('dashboard')">Dashboard</a>
+<nav class="navbar navbar-expand-lg bg-dark text-light position-sticky" style="top: 0; z-index: 1000;">
+  <div class="container-fluid">
+    <!-- Logo -->
+    <a class="navbar-brand fw-bold" (click)="navigateTo('dashboard')" style="cursor: pointer; color:whitesmoke">
+      ForexTrader
+    </a>
+
+    <!-- Mobile Toggle -->
+    <button class="navbar-toggler text-light border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+    </button>
+
+    <!-- Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item" *ngFor="let link of visibleNavLinks">
+          <a class="nav-link text-light px-3"
+            [ngClass]="{ 'fw-bold text-info border-bottom border-info': activeRoute === link.route }"
+            (click)="navigateTo(link.route)" style="cursor: pointer;">
+            {{ link.label }}
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Notifications and Profile -->
+    <div class="d-flex align-items-center ms-3">
+      <!-- <span class="text-light me-3 fs-5" title="Notifications">🔔</span> -->
+
+      <div class="dropdown">
+        <button class="btn btn-dark dropdown-toggle d-flex align-items-center" type="button" id="userProfile"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" class="rounded-circle me-2" width="32"
+            height="32">
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="userProfile">
+          <li *ngIf="user" class="dropdown-item-text">
+            <strong>{{ user.fullName }}</strong><br />
+            <small>{{ user.email }}</small>
           </li>
-          <li class="nav-item"  [ngClass]="{ 'active': activeRoute === 'admin' }" *ngIf="user?.role === 'ADMIN'">
-            <a class="nav-link" (click)="navigateTo('admin')">Admin</a>
+          <li *ngIf="user" class="dropdown-item-text">
+            <strong>Username:</strong> {{ user.username }}
           </li>
-          <li class="nav-item">
-            <a class="nav-link" [ngClass]="{ 'active': activeRoute === 'market' }" (click)="navigateTo('market')">Market</a>
+          <li *ngIf="user" class="dropdown-item-text">
+            <strong>Mobile:</strong> {{ user.mobileNumber }}
           </li>
-          <li class="nav-item">
-            <a class="nav-link" [ngClass]="{ 'active': activeRoute === 'portfolio' }" (click)="navigateTo('portfolio')">My Portfolio</a>
+          <li *ngIf="user" class="dropdown-item-text">
+            <strong>DOB:</strong> {{ user.dateOfBirth }}
           </li>
-          <li class="nav-item">
-            <a class="nav-link" [ngClass]="{ 'active': activeRoute === 'transactions' }" (click)="navigateTo('transactions')">Transactions</a>
+          <!-- <li *ngIf="user" class="dropdown-item-text">
+            <strong>Role:</strong> {{ user.role }}
+          </li> -->
+          <li *ngIf="user" class="dropdown-item-text">
+            <strong>Balance:</strong> {{ user.balance }}
           </li>
-          <li class="nav-item">
-            <a class="nav-link" [ngClass]="{ 'active': activeRoute === 'wallet' }" (click)="navigateTo('wallet')">Deposit/Withdraw</a>
+          <li>
+            <button class="dropdown-item" (click)="viewProfile()">Edit Profile</button>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" [ngClass]="{ 'active': activeRoute === 'help' }" (click)="navigateTo('help')">Help</a>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <button class="dropdown-item text-danger" (click)="logout()">Logout</button>
           </li>
         </ul>
       </div>
-  
-      <!-- Right Side - User Profile and Notifications -->
-      <div class="d-flex align-items-center">
-        <span class="notification-icon me-3" title="Notifications">🔔</span>
-  
-        <div class="dropdown">
-          <button class="btn btn-link dropdown-toggle" type="button" id="userProfile" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" class="avatar rounded-circle" />
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userProfile">
-            <li *ngIf="user" class="dropdown-item">
-              <strong>{{ user.fullName }}</strong><br />
-              <small>{{ user.email }}</small>
-            </li>
-            <li *ngIf="user" class="dropdown-item">
-              <strong>Username:</strong> {{ user.username }}
-            </li>
-            <li *ngIf="user" class="dropdown-item">
-              <strong>Mobile:</strong> {{ user.mobileNumber }}
-            </li>
-            <li *ngIf="user" class="dropdown-item">
-              <strong>DOB:</strong> {{ user.dateOfBirth }}
-            </li>
-            <li *ngIf="user" class="dropdown-item">
-              <strong>Role:</strong> {{ user.role }}
-            </li>
-            <li *ngIf="user" class="dropdown-item">
-              <strong>Balance:</strong> {{ user.balance }}
-            </li>
-            <li>
-                <button class="dropdown-item" (click)="viewProfile()">View profile</button>
-            </li>
-            <li><hr class="dropdown-divider"></li>
-            <li>
-              <button class="dropdown-item" (click)="logout()">Logout</button>
-            </li>
-          </ul>
-        </div>
-      </div>
     </div>
-  </nav>
+  </div>
+</nav>

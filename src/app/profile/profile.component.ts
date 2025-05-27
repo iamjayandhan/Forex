@@ -76,6 +76,14 @@ export class ProfileComponent implements OnInit{
 
   onCancel() {
     this.showModal = false;
-    this.router.navigate(['/portfolio']);
+
+    const role = this.userService.getUser()?.role;
+
+    if( role === 'ADMIN'){
+      this.router.navigate(['/admin']);
+    }
+    else{
+      this.router.navigate(['/portfolio']);
+    }
   }
 }

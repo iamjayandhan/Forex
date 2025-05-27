@@ -28,6 +28,9 @@ export class MarketComponent implements OnInit {
   searchQuery: string = '';
   searchChanged = new Subject<string>();
 
+  sortBy: string = 'id';
+  sortOrder: string = 'asc';
+
   pageSize: number = 10;
   currentPage: number = 0;
   totalRecords: number = 0;
@@ -63,7 +66,7 @@ export class MarketComponent implements OnInit {
 
   fetchStocks(): void {
     this.loading = true;
-    this.stockService.getPaginatedStocks(this.currentPage, this.pageSize, this.searchQuery).subscribe({
+    this.stockService.getPaginatedStocks(this.currentPage, this.pageSize, this.searchQuery,this.sortBy, this.sortOrder).subscribe({
       next: (response) => {
         const result = response.data;
         this.stocks = result.content;
@@ -78,6 +81,17 @@ export class MarketComponent implements OnInit {
       }
     });
   }
+
+  onSort(column: string): void {
+  if (this.sortBy === column) {
+    // Toggle sorting order
+    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+  } else {
+    this.sortBy = column;
+    this.sortOrder = 'asc';
+  }
+  this.fetchStocks();
+}
 
   onSearch(): void {
     this.currentPage = 0;

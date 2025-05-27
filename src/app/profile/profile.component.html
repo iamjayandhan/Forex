@@ -1,56 +1,58 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card shadow-lg border-0">
-        <div class="card-body p-4">
-          <h3 class="card-title text-center mb-4">Edit Profile</h3>
+<div class="dark-blue-theme py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8 col-sm-10">
+        <div class="card shadow-lg border-0 rounded-4">
+          <div class="card-body p-4">
+            <h3 class="card-title text-center mb-3">Edit Profile</h3>
+            <p class="text-center text-muted mb-4">Update your details below to keep your profile current.</p>
 
-          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-            <!-- Email (Read-only) -->
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" formControlName="email" readonly />
-            </div>
-
-            <!-- Full Name -->
-            <div class="mb-3">
-              <label class="form-label">Full Name</label>
-              <input type="text" class="form-control" formControlName="fullName" placeholder="Enter full name" />
-              <div class="text-danger small" *ngIf="profileForm.get('fullName')?.touched && profileForm.get('fullName')?.invalid">
-                Full Name is required.
+            <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+              <!-- Email (Read-only) -->
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" formControlName="email" readonly />
               </div>
-            </div>
 
-            <!-- Mobile Number -->
-            <div class="mb-3">
-              <label class="form-label">Mobile Number</label>
-              <input type="text" class="form-control" formControlName="mobileNumber" placeholder="Enter 10-digit number" />
-              <div class="text-danger small" *ngIf="profileForm.get('mobileNumber')?.touched && profileForm.get('mobileNumber')?.invalid">
-                <div *ngIf="profileForm.get('mobileNumber')?.errors?.['required']">Mobile Number is required.</div>
-                <div *ngIf="profileForm.get('mobileNumber')?.errors?.['pattern']">Enter a valid 10-digit mobile number.</div>
+              <!-- Full Name -->
+              <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" formControlName="fullName" placeholder="Enter full name" />
+                <div class="text-danger small" *ngIf="profileForm.get('fullName')?.touched && profileForm.get('fullName')?.invalid">
+                  Full Name is required.
+                </div>
               </div>
-            </div>
 
-            <!-- Date of Birth -->
-            <div class="mb-3">
-              <label class="form-label">Date of Birth</label>
-              <input type="date" class="form-control" formControlName="dateOfBirth" />
-              <div class="text-danger small" *ngIf="profileForm.get('dateOfBirth')?.touched && profileForm.get('dateOfBirth')?.invalid">
-                Date of Birth is required.
+              <!-- Mobile Number -->
+              <div class="mb-3">
+                <label class="form-label">Mobile Number</label>
+                <input type="text" class="form-control" formControlName="mobileNumber" placeholder="Enter 10-digit number" />
+                <div class="text-danger small" *ngIf="profileForm.get('mobileNumber')?.touched && profileForm.get('mobileNumber')?.invalid">
+                  <div *ngIf="profileForm.get('mobileNumber')?.errors?.['required']">Mobile Number is required.</div>
+                  <div *ngIf="profileForm.get('mobileNumber')?.errors?.['pattern']">Enter a valid 10-digit mobile number.</div>
+                </div>
               </div>
-            </div>
 
-            <!-- Submit Button -->
-             <div class="d-flex justify-content-between mt-4">
-               <button type="submit" class="btn btn-primary w-25" [disabled]="profileForm.invalid">
-                 Save Changes
-               </button>
-   
-               <button class="btn btn-secondary w-25" (click)="onCancel()">
-                 Cancel
-               </button>
-             </div>
-          </form>
+              <!-- Date of Birth -->
+              <div class="mb-3">
+                <label class="form-label">Date of Birth</label>
+                <input type="date" class="form-control" formControlName="dateOfBirth" />
+                <div class="text-danger small" *ngIf="profileForm.get('dateOfBirth')?.touched && profileForm.get('dateOfBirth')?.invalid">
+                  Date of Birth is required.
+                </div>
+              </div>
+
+              <!-- Submit + Cancel Buttons -->
+              <div class="d-flex flex-wrap justify-content-between gap-2 mt-4">
+                <button type="submit" class="btn btn-primary flex-grow-1" [disabled]="profileForm.invalid">
+                  Save Changes
+                </button>
+                <button type="button" class="btn btn-outline-secondary flex-grow-1" (click)="onCancel()">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>

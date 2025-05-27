@@ -29,8 +29,17 @@ export class StockService {
   }
 
   // GET: get paginated stocks
-  getPaginatedStocks(page: number, size: number, search: string = '') : Observable<any>{
-    const params: any = { page, size };
+  // getPaginatedStocks(page: number, size: number, search: string = '') : Observable<any>{
+  //   const params: any = { page, size };
+  //   if (search.trim() !== '') {
+  //     params.search = search;
+  //   }
+  //   return this.http.get<any>(`${environment.apiUrl}/stocks/paginated`,{ params});
+  // }
+
+  // GET: get paginated ordered stocks
+  getPaginatedStocks(page: number, size: number, search: string = '',sortBy: string = 'id', sortOrder: string = 'asc') : Observable<any>{
+    const params: any = { page, size,sortBy, sortOrder };
     if (search.trim() !== '') {
       params.search = search;
     }

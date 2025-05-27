@@ -1,21 +1,36 @@
+.navbar {
+  background: rgba(18, 18, 18, 0.4); /* semi-transparent dark */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* Smooth transition and spacing */
 .navbar-nav .nav-link {
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
-  margin: 5px 5px;
+  margin: 5px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  color: #ffffff;
 }
 
+/* Active link styling */
 .navbar-nav .nav-link.active {
-  background-color: #27b114;
-  color: white !important;
+  background-color: #27b114; /* Green active background */
+  color: #ffffff !important;
   border-radius: 5px;
-  /* padding: 5px 10px; */
 }
 
+/* Hover effect for non-active links */
 .navbar-nav .nav-link:not(.active):hover {
-  background-color: #e0e0e0;
+  background-color: #557abb; /* Blue hover background */
+  color: #ffffff;
   border-radius: 5px;
 }
 
+/* Brand logo cursor style */
 .navbar-brand {
   cursor: pointer;
 }

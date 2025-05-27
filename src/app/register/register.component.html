@@ -1,187 +1,188 @@
 <div class="container-fluid vh-100 p-0">
-    <div class="row vh-100 g-0">
-  
-      <!-- Left Section (blue background with image and text) -->
-      <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-center align-items-center bg-success text-white"
-      style="transform: scale(1); transform-origin: top center;">
-         <h2 class="text-center px-5">Register to join our community and access exclusive content.</h2>
-        <img src="assets/register1.svg" class="img-fluid w-50 mt-4" alt="Register Illustration">
-        <p class="mt-3 fs-5">Create an account to get started</p>
-      </div>
-  
-      <!-- Right Section (registration form) -->
-      <div class="col-12 col-lg-6 d-flex justify-content-center align-items-center bg-light">
-        <div class="card px-4 py-1 mt-4 shadow-sm" style="width: 90%; max-width: 400px; transform: scale(0.9); transform-origin: top center;">
-          
-          <!-- Logo -->
-          <div class="text-center mb-4">
-            <img src="assets/mobi1.svg" alt="Company Logo" width="120">
+  <div class="row g-0 vh-100" style="background: linear-gradient(135deg, #2f517b, #1b2838, #253447);">
+
+    <!-- Left Section: Welcome / Info Text -->
+    <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-center align-items-center text-white p-5">
+      <h1 class="display-4 fw-bold floating-text">Forex Trader</h1>
+
+      <h1 class="text-center mb-3 fw-bold glow floating-text">Join Our Community</h1>
+      
+      <p class="fs-5 text-center mb-4 glow fade-in-text" style="max-width: 400px;">
+        Create an account to get started and enjoy exclusive benefits, personalized insights, and 24/7 support.
+      </p>
+      
+      <ul class="list-unstyled fs-6 text-center glow fade-in-text" style="max-width: 400px;">
+        <li>✔ Intelligent dashboards tailored for you</li>
+        <li>✔ Secure and fast transactions</li>
+        <li>✔ Real-time market updates and alerts</li>
+        <li>✔ Join a community of expert traders</li>
+      </ul>
+    </div>
+
+
+    <!-- Right Section: Registration Form -->
+    <div class="col-12 col-lg-6 d-flex justify-content-center align-items-center">
+      <div class="card p-4 shadow-lg border-0" style="width: 90%; max-width: 420px; background-color: #1e2a38; color: #e0e1dd; border-radius: 1rem; max-height: 90vh; overflow-y: auto;">
+
+        <!-- Registration Form -->
+        <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="needs-validation" novalidate>
+
+          <!-- User Name -->
+          <div class="mb-3">
+            <label for="username" class="form-label fw-semibold text-light">User Name</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              class="form-control bg-dark text-white border-secondary"
+              [(ngModel)]="username"
+              required
+              placeholder="Enter User Name">
+            <div *ngIf="registerForm.controls['username']?.invalid && (registerForm.controls['username']?.touched || registerForm.submitted)" class="text-danger small mt-1">
+              User Name is required.
+            </div>
           </div>
-  
-          <!-- Registration Form -->
-          <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
-  
-            <div class="mb-3">
-              <label for="username" class="form-label fw-bold">User Name</label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                class="form-control"
-                placeholder="Enter User Name"
-                [(ngModel)]="username"
-                required>
-              <div *ngIf="registerForm.submitted && !username" class="form-text text-danger">
-                UserName required.
-              </div>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label for="email" class="form-label fw-semibold text-light">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-control bg-dark text-white border-secondary"
+              [(ngModel)]="email"
+              required
+              placeholder="Enter Email">
+            <div *ngIf="registerForm.controls['email']?.invalid && (registerForm.controls['email']?.touched || registerForm.submitted)" class="text-danger small mt-1">
+              Email is required.
             </div>
-  
-            <div class="mb-3">
-              <label for="email" class="form-label fw-bold">Email</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                class="form-control"
-                placeholder="Enter Email"
-                [(ngModel)]="email"
-                required>
-              <div *ngIf="registerForm.submitted && !email" class="form-text text-danger">
-                Email required.
-              </div>
-            </div>
-  
-           <div class="mb-3">
-            <label for="password" class="form-label fw-bold">Password</label>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-3">
+            <label for="password" class="form-label fw-semibold text-light">Password</label>
             <div class="position-relative">
               <input
                 [type]="showPassword ? 'text' : 'password'"
                 id="password"
                 name="password"
-                class="form-control"
-                placeholder="Enter password"
+                class="form-control bg-dark text-white border-secondary"
                 [(ngModel)]="password"
                 (input)="onPasswordInput()"
-                required>
-              <span
-                class="position-absolute top-50 end-0 translate-middle-y me-3"
-                style="cursor: pointer;"
-                (click)="togglePassword()">
-                {{ showPassword ? '🙈' : '👁' }}
+                required
+                placeholder="Enter Password">
+              <span class="position-absolute top-50 end-0 translate-middle-y me-3" style="cursor:pointer;" (click)="togglePassword()">
+                <i [ngClass]="showPassword ? 'bi-eye-fill text-white' : 'bi-eye-slash-fill text-white'"></i>
               </span>
             </div>
-            <div *ngIf="registerForm.submitted && !password" class="form-text text-danger">
-              Password required.
-            </div>
-
-            <!-- Password Rules -->
-            <ul class="mt-2 small ps-3">
+            <ul class="small ps-3 mt-2">
               <li [ngClass]="{'text-success': passwordValidations.minLength, 'text-danger': !passwordValidations.minLength}">
                 {{ passwordValidations.minLength ? '✔' : '✖' }} At least 8 characters
               </li>
               <li [ngClass]="{'text-success': passwordValidations.upperCase, 'text-danger': !passwordValidations.upperCase}">
-                {{ passwordValidations.upperCase ? '✔' : '✖' }} At least one uppercase letter
+                {{ passwordValidations.upperCase ? '✔' : '✖' }} One uppercase letter
               </li>
               <li [ngClass]="{'text-success': passwordValidations.lowerCase, 'text-danger': !passwordValidations.lowerCase}">
-                {{ passwordValidations.lowerCase ? '✔' : '✖' }} At least one lowercase letter
+                {{ passwordValidations.lowerCase ? '✔' : '✖' }} One lowercase letter
               </li>
               <li [ngClass]="{'text-success': passwordValidations.digit, 'text-danger': !passwordValidations.digit}">
-                {{ passwordValidations.digit ? '✔' : '✖' }} At least one digit
+                {{ passwordValidations.digit ? '✔' : '✖' }} One digit
               </li>
               <li [ngClass]="{'text-success': passwordValidations.specialChar, 'text-danger': !passwordValidations.specialChar}">
-                {{ passwordValidations.specialChar ? '✔' : '✖' }} At least one special character
+                {{ passwordValidations.specialChar ? '✔' : '✖' }} One special character
               </li>
             </ul>
           </div>
 
+          <!-- MPIN -->
+          <div class="mb-3">
+            <label for="mpin" class="form-label fw-semibold text-light">MPIN (4 digits)</label>
+            <div class="position-relative">
+              <input
+                [type]="showMPIN ? 'text' : 'password'"
+                id="mpin"
+                name="mpin"
+                maxlength="4"
+                pattern="[0-9]*"
+                class="form-control bg-dark text-white border-secondary"
+                [(ngModel)]="mpin"
+                required
+                placeholder="Enter 4-digit MPIN">
+              <span class="position-absolute top-50 end-0 translate-middle-y me-3" style="cursor:pointer;" (click)="toggleMPIN()">
+                <i [ngClass]="showMPIN ? 'bi-eye-fill text-white' : 'bi-eye-slash-fill text-white'"></i>
+              </span>
+            </div>
+            <div *ngIf="registerForm.controls['mpin']?.invalid && (registerForm.controls['mpin']?.touched || registerForm.submitted)" class="text-danger small mt-1">
+              MPIN is required.
+            </div>
+          </div>
 
-            <div class="mb-3">
-              <label for="mpin" class="form-label fw-bold">MPIN (4 digits)</label>
-              <div class="position-relative">
-                <input
-                  [type]="showMPIN ? 'text' : 'password'"
-                  id="mpin"
-                  name="mpin"
-                  maxlength="4"
-                  pattern="[0-9]*"
-                  class="form-control"
-                  placeholder="Enter 4-digit MPIN"
-                  [(ngModel)]="mpin"
-                  required>
-                <span
-                  class="position-absolute top-50 end-0 translate-middle-y me-3"
-                  style="cursor: pointer;"
-                  (click)="toggleMPIN()">
-                  {{ showMPIN ? '🙈' : '👁' }}
-                </span>
-              </div>
-              <div *ngIf="registerForm.submitted && !mpin" class="form-text text-danger">
-                MPIN required.
-              </div>
+          <!-- Full Name -->
+          <div class="mb-3">
+            <label for="fullName" class="form-label fw-semibold text-light">Full Name</label>
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              class="form-control bg-dark text-white border-secondary"
+              [(ngModel)]="fullName"
+              required
+              placeholder="Enter Full Name">
+            <div *ngIf="registerForm.controls['fullName']?.invalid && (registerForm.controls['fullName']?.touched || registerForm.submitted)" class="text-danger small mt-1">
+              Full Name is required.
             </div>
-  
-            <div class="mb-3">
-              <label for="fullName" class="form-label fw-bold">Full Name</label>
-              <input
-                type="text"
-                id="fullName"
-                name="fullName"
-                class="form-control"
-                placeholder="Enter Full Name"
-                [(ngModel)]="fullName"
-                required>
-              <div *ngIf="registerForm.submitted && !fullName" class="form-text text-danger">
-                Full Name required.
-              </div>
-            </div>
-  
-            <div class="mb-3">
-              <label for="mobileNumber" class="form-label fw-bold">Mobile Number</label>
-              <input
-                type="text"
-                id="mobileNumber"
-                name="mobileNumber"
-                class="form-control"
-                placeholder="Enter Mobile Number"
-                [(ngModel)]="mobileNumber"
-                required>
-              <div *ngIf="registerForm.submitted && !mobileNumber" class="form-text text-danger">
-                Mobile Number required.
-              </div>
-            </div>
-  
-            <div class="mb-3">
-              <label for="dateOfBirth" class="form-label fw-bold">Date of Birth</label>
-              <input
-                type="date"
-                id="dateOfBirth"
-                name="dateOfBirth"
-                class="form-control"
-                [(ngModel)]="dateOfBirth"
-                required>
-              <div *ngIf="registerForm.submitted && !dateOfBirth" class="form-text text-danger">
-                Date of Birth required.
-              </div>
-            </div>
-  
-            <div class="d-grid justify-content-center">
-              <button type="submit" class="btn btn-success">Register</button>
-            </div>
+          </div>
 
-            <div class="d-flex justify-content-center w-100 mt-3">
-              <a [routerLink]="['/login']" class="text-decoration-none text-primary">Already have an account? login here.</a>
+          <!-- Mobile Number -->
+          <div class="mb-3">
+            <label for="mobileNumber" class="form-label fw-semibold text-light">Mobile Number</label>
+            <input
+              type="text"
+              id="mobileNumber"
+              name="mobileNumber"
+              class="form-control bg-dark text-white border-secondary"
+              [(ngModel)]="mobileNumber"
+              required
+              placeholder="Enter Mobile Number">
+            <div *ngIf="registerForm.controls['mobileNumber']?.invalid && (registerForm.controls['mobileNumber']?.touched || registerForm.submitted)" class="text-danger small mt-1">
+              Mobile Number is required.
             </div>
-  
-            <!-- Error Message (if any) -->
-            <div *ngIf="errorMsg" class="text-danger text-center mt-3">
-              {{ errorMsg }}
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="mb-4">
+            <label for="dateOfBirth" class="form-label fw-semibold text-light">Date of Birth</label>
+            <input
+              type="date"
+              id="dateOfBirth"
+              name="dateOfBirth"
+              class="form-control bg-dark text-white border-secondary"
+              [(ngModel)]="dateOfBirth"
+              required>
+            <div *ngIf="registerForm.controls['dateOfBirth']?.invalid && (registerForm.controls['dateOfBirth']?.touched || registerForm.submitted)" class="text-danger small mt-1">
+              Date of Birth is required.
             </div>
-  
-          </form>
-  
-        </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-grid">
+            <button type="submit" class="btn btn-outline-light fw-semibold">Register</button>
+          </div>
+
+          <!-- Navigation -->
+          <div class="text-center mt-3">
+            <a [routerLink]="['/login']" class="text-decoration-none text-info small">Already have an account? Login here.</a>
+          </div>
+
+          <!-- Error Message -->
+          <div *ngIf="errorMsg" class="text-danger text-center mt-3 small">
+            {{ errorMsg }}
+          </div>
+
+        </form>
       </div>
-  
     </div>
+
   </div>
-  
+</div>

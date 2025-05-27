@@ -1,5 +1,128 @@
-.dashboard-container {
-    text-align: center;
-    margin-top: 50px;
-  }
-  
+.dashboard-wrapper {
+  min-height: 100vh;
+  padding: 40px;
+  background: linear-gradient(135deg, #2f517b, #1b2838, #253447); /* softer dark blue-gray */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #d0d7e0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.glass-header {
+  background: rgba(40, 60, 85, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(90, 130, 180, 0.3);
+  border-radius: 18px;
+  padding: 36px;
+  text-align: center;
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 40px;
+  box-shadow: 0 10px 30px rgba(35, 60, 90, 0.3);
+  color: #e1e6ec;
+}
+
+.glass-header:hover {
+  background: rgba(50, 75, 110, 0.25);
+  box-shadow: 0 12px 40px rgba(30, 50, 75, 0.35);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.glass-card {
+  background: rgba(50, 75, 110, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(90, 130, 180, 0.2);
+  border-radius: 14px;
+  padding: 28px 20px;
+  box-shadow: 0 6px 20px rgba(30, 50, 75, 0.3);
+  color: #c8d1db;
+  transition: background-color 0.3s ease;
+}
+
+.glass-card:hover {
+  background: rgba(90, 130, 180, 0.25);
+}
+
+.stat-card {
+  text-align: center;
+  font-size: 1.15rem;
+}
+
+.glass-panel {
+  background: rgba(40, 60, 85, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(90, 130, 180, 0.18);
+  border-radius: 16px;
+  padding: 30px;
+  width: 100%;
+  max-width: 1200px;
+  box-shadow: 0 8px 30px rgba(35, 60, 90, 0.25);
+  color: #d3d9e3;
+  margin-top: 40px;
+}
+
+.glass-panel:hover{
+  background: rgba(50, 75, 110, 0.25);
+  box-shadow: 0 12px 40px rgba(30, 50, 75, 0.35);
+}
+
+.dashboard-footer {
+  margin-top: auto;
+  width: 100%;
+  max-width: 900px;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.logout-btn {
+  padding: 10px 26px;
+  font-size: 1rem;
+  border-radius: 28px;
+  border: 2px solid #7a9bcf;
+  color: #7a9bcf;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #557abb;
+  border-color: #557abb;
+  color: white;
+}
+
+.green {
+  color: green;
+}
+
+.red {
+  color: red;
+}
+
+.footer {
+  font-size: 0.9rem;
+  color: #bbb; /* light grey text */
+}
+
+.footer-link {
+  color: #eee;
+  text-decoration: none;
+  margin: 0 8px;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+  color: #fff;
+}
+

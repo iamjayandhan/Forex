@@ -1,0 +1,89 @@
+.table td,
+.table th {
+  vertical-align: middle;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* for the dark blue theme */
+.dark-blue-theme {
+  background: linear-gradient(135deg, #2f517b, #1b2838, #253447);
+
+  color: #e0e1dd;
+  min-height: 100vh;
+}
+
+/* for the table */
+
+.table-light-contrast {
+  width: 100%;
+  border-collapse: separate; /* important for spacing */
+  border-spacing: 0 3px; /* space between rows */
+  background-color: transparent; /* no table bg */
+  color: #212529;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Remove default borders from th and td */
+.table-light-contrast th,
+.table-light-contrast td {
+  border: none;
+  padding: 6px 8px;
+  background-color: #e0e9f9;
+}
+
+/* Header style */
+.table-light-contrast thead tr {
+  background-color: #e0e0e0;
+  border-radius: 12px;
+}
+
+.table-light-contrast thead th {
+  font-weight: 600;
+  color: #212529;
+  text-align: center;
+  padding: 14px 16px;
+  background-color: #85b0f9;
+}
+
+/* Row style */
+.table-light-contrast tbody tr {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Row hover */
+.table-light-contrast tbody tr:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background-color: #f9f9f9;
+}
+
+/* Center alignment for numeric columns */
+.table-light-contrast tbody td.text-center,
+.table-light-contrast thead th.text-center {
+  text-align: center;
+}
+
+/* Align right for price columns */
+.table-light-contrast tbody td.text-end,
+.table-light-contrast thead th.text-end {
+  text-align: right;
+}
+
+/* title with linearGradient*/
+
+h1 {
+  font-size: 2.25rem; /* 36px */
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid #3b82f6; /* blue-500 */
+}

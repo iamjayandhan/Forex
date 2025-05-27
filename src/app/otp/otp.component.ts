@@ -22,6 +22,8 @@ export class OtpComponent implements OnInit, OnDestroy {
   showEmailInput: boolean = true;
   private timerInterval: any;
 
+  showPassword: boolean = false;
+
   private fb = inject(FormBuilder);
   private notyf = inject(NotyfService);
   private router = inject(Router);
@@ -56,6 +58,34 @@ export class OtpComponent implements OnInit, OnDestroy {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
     }
+  }
+
+  passwordValidations = {
+    minLength: false,
+    upperCase: false,
+    lowerCase: false,
+    digit: false,
+    specialChar: false
+  };
+
+  onPasswordInput(event: Event) {
+    const input = event.target as HTMLInputElement | null;
+    if (!input) return; // safety check
+    const value = input.value;
+
+    this.passwordValidations.minLength = value.length >= 8;
+    this.passwordValidations.upperCase = /[A-Z]/.test(value);
+    this.passwordValidations.lowerCase = /[a-z]/.test(value);
+    this.passwordValidations.digit = /\d/.test(value);
+    this.passwordValidations.specialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+  }
+
+  get isPasswordValid(): boolean {
+    return this.passwordValidations.minLength &&
+      this.passwordValidations.upperCase &&
+      this.passwordValidations.lowerCase &&
+      this.passwordValidations.digit &&
+      this.passwordValidations.specialChar;
   }
 
  // --- Send OTP ---
@@ -171,5 +201,16 @@ export class OtpComponent implements OnInit, OnDestroy {
 
   private padZero(num: number): string {
     return num < 10 ? '0' + num : num.toString();
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+  
+  goToLogin(){
+    if(localStorage.getItem('email')) localStorage.removeItem('email');
+    if(localStorage.getItem('otpVerified')) localStorage.removeItem('otpVerified');
+    
+    this.router.navigate(['/login']);
   }
 }

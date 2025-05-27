@@ -1,9 +1,61 @@
-<div class="dashboard-container">
-  <h2>Welcome to the Dashboard!</h2>
-  <p>You're successfully logged in.</p>
+<div class="dashboard-wrapper">
+  <!-- Header Panel -->
+  <!-- <header class="glass-header">
+    <h2 *ngIf="user">Welcome {{ user.fullName }}!</h2>
+    <p *ngIf="user">You're successfully logged in. ({{ user.email }})</p>
+  </header> -->
 
-  <p *ngIf="user">Logged in as: <strong>{{ user.fullName }}</strong> ({{ user.email }})</p>
+  <h4>Live updates</h4>
 
-  <!-- Logout Button -->
-  <button (click)="logout()" class="btn btn-danger">Logout</button>
+  <section class="dashboard-grid mt-3 pb-5">
+    <div class="glass-card stat-card" *ngFor="let update of liveUpdates">
+      <h5>
+        {{ update.name }}
+        <span style="font-size: 0.8rem;">({{ update.symbol }})</span>
+      </h5>
+      <p class="price" [ngClass]="update.isUp ? 'green' : 'red'">
+        <strong>${{ update.price | number:'1.2-2' }}</strong>
+      </p>
+      <p class="change" [ngClass]="update.isUp ? 'green' : 'red'">
+        <strong>${{ update.isUp ? '+' : '' }}{{ update.changePercent }}%</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- <app-charts></app-charts> -->
+   <app-real-time-chart></app-real-time-chart>
+
+<!-- Section: Wide Panel -->
+<section class="glass-panel mt-5 mb-5">
+  <h4>Summary Report</h4>
+  <p>
+    Our trading platform has seen a steady growth in user engagement over the last month. 
+    The average session duration increased by 12%, with over 1,200 active users and consistent revenue growth.
+  </p>
+</section>
+
+<!-- Quick Stats Row -->
+<section class="dashboard-grid">
+  <div class="glass-card stat-card">
+    <h5>Users</h5>
+    <p>1,240</p>
+  </div>
+  <div class="glass-card stat-card">
+    <h5>Active Sessions</h5>
+    <p>312</p>
+  </div>
+  <div class="glass-card stat-card">
+    <h5>Revenue</h5>
+    <p>$23,450</p>
+  </div>
+</section>
+
+<footer class="footer glass-panel mt-5 p-3 text-center">
+  <p>© 2025 Forex Trading Dashboard. All rights reserved.</p>
+  <p>
+    <a href="mailto:forexalerts25@gmail.com" class="footer-link">Support</a>
+  </p>
+</footer>
+
 </div>
+

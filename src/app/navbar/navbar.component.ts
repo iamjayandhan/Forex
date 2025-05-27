@@ -55,4 +55,26 @@ export class NavbarComponent implements OnInit {
       this.router.navigate([route]);
     }
   }
+
+  // navLinks = used in template
+  navLinks = [
+    { route: 'dashboard', label: 'Dashboard' },
+    { route: 'admin', label: 'Admin', condition: () => this.user?.role === 'ADMIN' },
+    { route: 'market', label: 'Market' },
+    { route: 'portfolio', label: 'My Portfolio' },
+    { route: 'transactions', label: 'Transactions' },
+    { route: 'wallet', label: 'Deposit/Withdraw' },
+    { route: 'help', label: 'Help' }
+  ];
+
+  get visibleNavLinks() {
+    if (this.user?.role === 'ADMIN') {
+      // Only show Admin route if user is admin
+      return this.navLinks.filter(link => link.route === 'admin');
+    } else {
+      // Show all routes except Admin for non-admins
+      return this.navLinks.filter(link => link.route !== 'admin');
+    }
+  }
+
 }

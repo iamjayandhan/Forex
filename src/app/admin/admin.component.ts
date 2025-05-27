@@ -270,4 +270,8 @@ export class AdminComponent implements OnInit {
   get totalPages(): number {
     return Math.ceil(this.totalRecords / this.pageSize);
   }
+
+  isAdmin(): boolean {
+    return this.user?.role === 'ADMIN';
+  }
 }

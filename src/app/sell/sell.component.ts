@@ -30,6 +30,8 @@ export class SellComponent implements OnInit {
   isPlacingSellOrder: boolean = false;
   showConfirmModal: boolean = false;
 
+  readonly SELL_LIMIT = 50000;
+
   constructor(
     public router: Router,
     private notyf: NotyfService,
@@ -71,7 +73,7 @@ export class SellComponent implements OnInit {
   onQuantityChange(value: number) {
     if (value < 1 || !Number.isInteger(value)) {
       this.notyf.error('Quantity must be a positive integer');
-      this.quantity = 1;
+      this.quantity = 0;
     } 
     else if(value> this.stock.quantity) {
       this.notyf.error('Quantity exceeds available stock');
@@ -196,6 +198,13 @@ export class SellComponent implements OnInit {
   //valid qty check
   get isQuantityInvalid(): boolean {
     return this.quantity < 1 || !Number.isInteger(this.quantity);
+  }
+
+  get isSellLimitExceeded(): boolean {
+    if(this.quantity == 1){
+      return false;
+    }
+    return this.subtotal > this.SELL_LIMIT;
   }
 
   //total cost calculation ============

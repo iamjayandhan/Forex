@@ -20,10 +20,15 @@ export class TransactionsComponent implements OnInit {
   error: string = '';
 
   currentTime: Date = new Date();
+  today: string = ''; // For max date in inputs
 
   searchQuery: string = '';
   selectedType: string = 'all';
   selectedTransaction: any = null;
+  showModal: boolean = false;
+
+  startDate: string = '';
+  endDate: string = '';
 
   totalPages: number = 0;
   currentPage: number = 0;
@@ -35,10 +40,21 @@ export class TransactionsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     this.loadUserAndTransactions();
     setInterval(() => {
       this.currentTime = new Date();
     }, 1000);
+  }
+
+  openTransactionModal(txn: any) {
+    this.selectedTransaction = txn;
+    this.showModal = true;
+  }
+
+  closeTransactionModal() {
+    this.selectedTransaction = null;
+    this.showModal = false;
   }
 
   loadUserAndTransactions(): void {
@@ -56,12 +72,19 @@ export class TransactionsComponent implements OnInit {
 
   getTransactions(userId: number): void {
     this.isLoading = true;
-    this.portfolioService.getTransactions(userId).subscribe({
+    this.portfolioService.getTransactionsPaginated(
+      userId,
+      this.currentPage,
+      this.pageSize,
+      this.selectedType,
+      this.startDate,
+      this.endDate,
+      this.searchQuery
+    ).subscribe({
       next: (res) => {
-        this.transactions = res.data;
+        this.transactions = res.data.transactions;
+        this.totalPages = res.data.totalPages;
         this.isLoading = false;
-        this.currentPage = 0; // Reset to first page after data load
-        this.updateTotalPages();
       },
       error: (err) => {
         console.error('Error fetching transactions:', err);
@@ -71,67 +94,118 @@ export class TransactionsComponent implements OnInit {
     });
   }
 
-  updateTotalPages() {
-    this.totalPages = Math.ceil(this.filteredTransactions.length / this.pageSize);
+  onSearch(): void {
+    this.currentPage = 0;
+    if (this.user) {
+      this.getTransactions(this.user.userId);
+    }
   }
 
-  // Filtering based on type and search query
-  get filteredTransactions() {
-    if (!Array.isArray(this.transactions)) return [];
+  onDateChange(): void {
+  this.error = '';
+  // no getTransactions() call here!
+  if (this.startDate && this.endDate) {
+    const start = new Date(this.startDate);
+    const end = new Date(this.endDate);
+    const today = new Date();
 
-    const filtered = this.transactions.filter(txn => {
-      // Filter by type
-      if (this.selectedType !== 'all' && txn.transactionType.toLowerCase() !== this.selectedType.toLowerCase()) {
-        return false;
-      }
-      return true;
-    }).filter(txn => {
-      // Filter by search query
-      const query = this.searchQuery.toLowerCase().trim();
-      if (!query) return true;
-      return (
-        txn.stock?.name?.toLowerCase().includes(query) ||
-        txn.stock?.symbol?.toLowerCase().includes(query) ||
-        txn.transactionType?.toLowerCase().includes(query)
-      );
-    });
-
-    return filtered;
-  }
-
-  // Get the current page's transactions after filtering
-  get filteredAndPaginatedTransactions() {
-    this.updateTotalPages();
-
-    // Make sure currentPage is within bounds
-    if (this.currentPage >= this.totalPages) {
-      this.currentPage = this.totalPages - 1 >= 0 ? this.totalPages - 1 : 0;
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      this.error = 'Invalid date format.';
+      return;
     }
 
-    const startIndex = this.currentPage * this.pageSize;
-    return this.filteredTransactions.slice(startIndex, startIndex + this.pageSize);
+    if (start > end) {
+      this.error = 'Start date cannot be after end date.';
+      return;
+    }
+
+    if (start > today || end > today) {
+      this.error = 'Dates cannot be in the future.';
+      return;
+    }
+  }
+}
+
+
+applyDateFilter(): void {
+  this.error = '';
+
+  if (!this.startDate || !this.endDate) {
+    this.error = 'Both start and end dates are required.';
+    return;
+  }
+
+  const start = new Date(this.startDate);
+  const end = new Date(this.endDate);
+  const today = new Date();
+
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    this.error = 'Invalid date format.';
+    return;
+  }
+
+  if (start > end) {
+    this.error = 'Start date cannot be after end date.';
+    return;
+  }
+
+  if (start > today || end > today) {
+    this.error = 'Dates cannot be in the future.';
+    return;
+  }
+
+  this.currentPage = 0;
+  if (this.user) {
+    this.getTransactions(this.user.userId);
+  }
+}
+
+
+  clearDateFilters(): void {
+    this.startDate = '';
+    this.endDate = '';
+    this.error = '';
+    this.currentPage = 0;
+    if (this.user) {
+      this.getTransactions(this.user.userId);
+    }
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 0;
+    if (this.user) {
+      this.getTransactions(this.user.userId);
+    }
+  }
+
+  onFilterChange(type: string) {
+    this.selectedType = type;
+    this.currentPage = 0;
+    if (this.user) {
+      this.getTransactions(this.user.userId);
+    }
   }
 
   toggleDetails(txn: any) {
     this.selectedTransaction = this.selectedTransaction === txn ? null : txn;
   }
 
-  // Call this whenever searchQuery or selectedType changes to reset page
-  onFilterChange() {
-    this.currentPage = 0;
-    this.updateTotalPages();
-  }
-
   // Pagination controls
   goToPreviousPage() {
     if (this.currentPage > 0) {
       this.currentPage--;
+      if (this.user) {
+        this.getTransactions(this.user.userId);
+      }
     }
   }
 
   goToNextPage() {
     if (this.currentPage < this.totalPages - 1) {
       this.currentPage++;
+      if (this.user) {
+        this.getTransactions(this.user.userId);
+      }
     }
   }
 

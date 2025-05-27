@@ -131,6 +131,7 @@ export class WalletComponent implements OnInit {
 //   });
 // }
   onPageSizeChange(){
+    this.currentPage = 0;
     this.loadWalletTransactionsPaginated(this.currentPage, this.pageSize);
   }
 
@@ -176,6 +177,9 @@ export class WalletComponent implements OnInit {
   }
 
   get isAmountValid(): boolean {
-    return this.amount > 100;
+    const amt = Number(this.amount);
+    return amt >= 100 && amt <= 10000;
   }
+
+
 }

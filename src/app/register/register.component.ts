@@ -26,6 +26,7 @@ export class RegisterComponent {
 
   showPassword: boolean = false;
   showMPIN: boolean = false;
+  showModal = false;
 
   constructor(
     private authService: AuthService, 
@@ -41,6 +42,14 @@ export class RegisterComponent {
     specialChar: false,
   };
 
+  openModal() {
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+  }
+  
   validatePassword(password: string) {
     this.passwordValidations = {
       minLength: password.length >= 8,

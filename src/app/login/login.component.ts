@@ -47,7 +47,14 @@ export class LoginComponent {
                 // console.log("going to dashboard!");
 
                 this.notyf.success("Login success!");
-                this.router.navigate(['/dashboard']);
+                
+                //route based on role
+                const role  = this.userService.getUser()?.role;
+                if(role === 'ADMIN'){
+                  this.router.navigate(['/admin']);
+                } else {
+                  this.router.navigate(['/dashboard']);
+                }
             });
           } else {
             this.notyf.error("No token received from server.");

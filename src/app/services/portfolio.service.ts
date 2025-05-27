@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment'; // Adjust path if needed
@@ -45,10 +45,20 @@ export class PortfolioService {
   }
 
   // GET: Fetch paginated transactions
-  getTransactionsPaginated(userId: number, page: number, pageSize: number): Observable<any> {
-    return this.http.get(`${environment.apiUrl}/portfolio/transactions/paginated?page=${page}&size=${pageSize}&userId=${userId}`, {
-      withCredentials: true,
-    }).pipe(
+  getTransactionsPaginated(userId: number, page: number, pageSize: number, selectedType:string,startDate?: string,endDate?: string, searchQuery?: string): Observable<any> {
+
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', pageSize.toString())
+      .set('userId', userId.toString())
+      .set('transactionType', selectedType);    
+
+    if(startDate) params = params.set('startDate', startDate);
+    if(endDate) params = params.set('endDate', endDate);
+    if(searchQuery) params = params.set('searchQuery', searchQuery);
+    
+    return this.http.get(`${environment.apiUrl}/portfolio/transactions/paginated`, { params, withCredentials: true },
+      ).pipe(
       catchError((error) => {
         console.error("Error fetching paginated transactions", error);
         throw error;
@@ -68,9 +78,9 @@ export class PortfolioService {
   }
 
   // GET: Fetch paginated holdings
-  getHoldingsPaginated(userId: number, page: number, pageSize: number): Observable<any> {
+  getHoldingsPaginated(userId: number, page: number, pageSize: number,sortBy: string, sortOrder: string): Observable<any> {
     // console.log(`Fetching paginated holdings for userId: ${userId}, page: ${page}, pageSize: ${pageSize}`);
-    return this.http.get(`${environment.apiUrl}/portfolio/holdings/paginated?page=${page}&size=${pageSize}&userId=${userId}`, {
+    return this.http.get(`${environment.apiUrl}/portfolio/holdings/paginated?page=${page}&size=${pageSize}&userId=${userId}&sortBy=${sortBy}&sortOrder=${sortOrder}`, {
       withCredentials: true,
     }).pipe(
       catchError((error) => {
