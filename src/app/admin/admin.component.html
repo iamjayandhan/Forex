@@ -3,8 +3,8 @@
     <h3 *ngIf="!isAdmin()">Manage Stocks</h3>
     <h1 *ngIf="isAdmin()" style="margin-bottom: 2rem;">Welcome to Admin Dashboard</h1>
   
-    <div *ngIf="loading">Loading...</div>
-    <div *ngIf="error" class="text-danger">{{ error }}</div>
+    <!-- <div *ngIf="loading">Loading...</div> -->
+    <!-- <div *ngIf="error" class="text-danger">{{ error }}</div> -->
   
       <div class="d-flex align-items-center mt-2 pb-3 flex-wrap gap-2">
           <!-- Search -->
@@ -109,9 +109,9 @@
        </table>
      </div>
   
-    <div *ngIf="!loading && stocks.length === 0" class="text-muted">
+    <!-- <div *ngIf="!loading && stocks.length === 0" class="text-muted">
       No data found.
-    </div>
+    </div> -->
   
     <!-- Pagination -->
     <nav *ngIf="totalPages > 1" class="mt-3">

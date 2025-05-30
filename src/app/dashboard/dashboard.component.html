@@ -5,10 +5,13 @@
     <p *ngIf="user">You're successfully logged in. ({{ user.email }})</p>
   </header> -->
 
-  <h4>Live updates</h4>
+  <h1 class="display-4 fw-bold floating-text">Forex Trader</h1>
+  <h1 class="text-center mb-4 fw-blod glow floating-text">Ready to conquer the market?</h1>
+
+  <h4 class="glow">Live updates</h4>
 
   <section class="dashboard-grid mt-3 pb-5">
-    <div class="glass-card stat-card" *ngFor="let update of liveUpdates">
+    <div class="glass-card stat-card custom-card" *ngFor="let update of liveUpdates">
       <h5>
         {{ update.name }}
         <span style="font-size: 0.8rem;">({{ update.symbol }})</span>
@@ -26,7 +29,7 @@
    <app-real-time-chart></app-real-time-chart>
 
 <!-- Section: Wide Panel -->
-<section class="glass-panel mt-5 mb-5">
+<section class="glass-panel mt-5 mb-5 custom-card">
   <h4>Summary Report</h4>
   <p>
     Our trading platform has seen a steady growth in user engagement over the last month. 
@@ -35,7 +38,7 @@
 </section>
 
 <!-- Quick Stats Row -->
-<section class="dashboard-grid">
+<section class="dashboard-grid ">
   <div class="glass-card stat-card">
     <h5>Users</h5>
     <p>1,240</p>

@@ -1,1 +1,114 @@
-<p>landing-page works!</p>
+<!-- landing-navbar.component.html -->
+<nav class="navbar navbar-expand-lg bg-dark text-light position-sticky" style="top: 0; z-index: 1000;">
+  <div class="container-fluid">
+    <!-- Logo -->
+    <a class="navbar-brand fw-bold" (click)="navigateTo('home')" style="color:whitesmoke;">
+      ForexTrader
+    </a>
+
+    <!-- Mobile Toggle -->
+    <button class="navbar-toggler text-light border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+    </button>
+
+    <!-- Navigation Links -->
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+      <ul class="navbar-nav d-flex justify-content-center">
+        <li class="nav-item" *ngFor="let link of landingLinks">
+          <a class="nav-link text-light px-3"
+            [ngClass]="{ 'fw-bold text-info border-bottom border-info': activeRoute === link.route }"
+            (click)="navigateTo(link.route)">
+            {{ link.label }}
+          </a>
+        </li>
+      </ul>
+    </div>
+
+
+    <!-- Login / Sign Up -->
+    <div class="d-flex align-items-center ms-3 gap-3">
+      <button class="btn btn-outline-light px-3 py-1" (click)="navigateTo('login')">Login</button>
+      <button class="btn btn-light px-3 py-1" (click)="navigateTo('register')">Sign Up</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="text-center py-5 px-3" style="background: radial-gradient(ellipse at top left, #15192e, #0d0e17); color: white;">
+  <div class="container">
+
+    <!-- Title -->
+    <h1 class="display-5 fw-bold lh-sm mb-4">
+      Easily invest in stocks <br />
+      in one <span style="background: linear-gradient(to right, #6ac1ff, #007cf0, #00dfd8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ForexTrader platform</span>
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="lead text-secondary mb-4">
+      Get all the conveniences of investing in stocks in one<br />
+      ForexTrader platform. Register and login to get started.
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="d-flex justify-content-center gap-3 mb-5 pb-2">
+      <button class="btn btn-outline-light px-4 py-2" (click)="navigateTo('login')">Login</button>
+      <button class="btn btn-light px-4 py-2" (click)="navigateTo('register')">Sign up</button>
+    </div>
+
+    <!-- Hero Image -->
+    <div class="glow-wrapper floating-glow">
+    <img src="assets/images/home.png" alt="App UI preview"
+        class="img-fluid rounded-4" style="max-width: 100%; height: auto;" />
+    </div>
+
+  </div>
+    <p class="lead text-secondary mb-4 pt-5">
+     Lets get started!
+    </p>
+</section>
+
+
+
+<!-- Footer -->
+<footer class="text-light py-5" style="background: linear-gradient(135deg, #1b1f2a, #101218);">
+  <div class="container">
+    <div class="row gy-4">
+
+      <!-- About -->
+      <div class="col-md-4">
+        <h5 class="fw-bold mb-3">ForexTrader</h5>
+        <p class="text-secondary">
+          Simplifying your investment journey. Trade stocks, crypto, and more—all in one platform.
+        </p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="col-md-4">
+        <h5 class="fw-bold mb-3">Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a href="#services" class="text-secondary text-decoration-none hover-link">Services</a></li>
+          <li><a href="#products" class="text-secondary text-decoration-none hover-link">Products</a></li>
+          <li><a href="#about" class="text-secondary text-decoration-none hover-link">About Us</a></li>
+          <li><a (click)="navigateTo('login')" class="text-secondary text-decoration-none hover-link">Login</a></li>
+        </ul>
+      </div>
+
+      <!-- Social Links -->
+      <div class="col-md-4">
+        <h5 class="fw-bold mb-3">Connect with us</h5>
+        <div class="d-flex gap-3">
+          <a href="#" class="text-light fs-5"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="text-light fs-5"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="text-light fs-5"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="text-light fs-5"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+
+    </div>
+
+    <hr class="my-4 border-secondary" />
+
+    <p class="text-center text-secondary small mb-0">&copy; 2025 ForexTrader. All rights reserved.</p>
+  </div>
+</footer>

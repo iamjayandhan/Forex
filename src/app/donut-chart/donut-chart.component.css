@@ -19,3 +19,15 @@
   fill: white !important;
   color: white !important;
 }
+
+.custom-card {
+  background: #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);  /* base shadow */
+  border-radius: 0.75rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);  /* deeper glow on hover */
+}

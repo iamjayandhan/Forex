@@ -35,7 +35,7 @@
       <h6 class="text-muted mb-2">
         <i class="bi bi-info-circle-fill"></i> Note:  
         - Quantity cannot exceed your holdings.  
-        - Maximum transaction value per order is ₹50,000, except for high-priced stocks where selling 1 quantity is allowed regardless of price.
+        - Maximum transaction value per order is ₹1,00,000, except for high-priced stocks where selling 1 quantity is allowed regardless of price.
       </h6>
       <h6 *ngIf="stock.stock.currentPrice - stock.avgPrice < 0" class="text-danger">
         It seems that sell computes to Loss!, Please proceed carefully.
@@ -257,7 +257,7 @@
               class="form-control"
               [(ngModel)]="enteredMPIN"
               maxlength="6"
-              placeholder="Enter your 6-digit MPIN"
+              placeholder="Enter your 4-digit MPIN"
               [disabled]="isPlacingSellOrder"
             />
           </div>
@@ -274,7 +274,8 @@
           <button
             type="button"
             class="btn btn-success"
-            [disabled]="isPlacingSellOrder"
+            data-bs-dismiss="modal"
+            [disabled]="isPlacingSellOrder || enteredMPIN.length < 4"
             (click)="handleModalConfirm()"
           >
             {{ isPlacingSellOrder ? 'Placing Order...' : 'Confirm Sell' }}

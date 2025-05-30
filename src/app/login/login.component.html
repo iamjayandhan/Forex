@@ -47,7 +47,7 @@
                 [type]="showPassword ? 'text' : 'password'"
                 id="password"
                 name="password"
-                class="form-control bg-dark text-black border-secondary"
+                class="form-control bg-dark text-white border-secondary"
                 placeholder="Enter password"
                 [(ngModel)]="password"
                 required
@@ -80,10 +80,21 @@
             {{ errorMsg }}
           </div>
 
+          
         </form>
-
+        
+        <div class="d-flex justify-content-center">
+          <button 
+            class="btn btn-outline-secondary mt-4" 
+            (click)="goToHome()" 
+            style="font-size: 0.9rem; width: 150px;"
+          >
+            ← Back
+          </button>
+        </div>
       </div>
-    </div>
 
+    </div>
+    
   </div>
 </div>

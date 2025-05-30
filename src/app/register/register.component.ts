@@ -50,6 +50,10 @@ export class RegisterComponent {
     this.showModal = false;
   }
   
+  goToHome() : any{
+    this.router.navigate(['/home']);
+  }
+
   validatePassword(password: string) {
     this.passwordValidations = {
       minLength: password.length >= 8,

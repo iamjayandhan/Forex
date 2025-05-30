@@ -92,34 +92,43 @@
 
         <hr>
 
-        <h6>Charge Breakdown</h6>
-        <ul class="list-unstyled text-muted">
-          <li>Brokerage: ₹{{ selectedTransaction?.brokerage }}</li>
-          <li>Exchange Txn Charges: ₹{{ selectedTransaction?.exchangeTxnCharges }}</li>
-          <li *ngIf="selectedTransaction?.transactionType === 'BUY'">Stamp Duty: ₹{{ selectedTransaction?.stampDuty }}</li>
-          <li *ngIf="selectedTransaction?.transactionType === 'SELL'">Stamp Duty: ₹{{ selectedTransaction?.stampDuty }} <span class="text-danger">(excluded)</span></li>
-          <li>IPFT: ₹{{ selectedTransaction?.ipft }}</li>
-          <li>SEBI Charges: ₹{{ selectedTransaction?.sebiCharges }}</li>
-          <li>STT: ₹{{ selectedTransaction?.stt }}</li>
-          <li>GST: ₹{{ selectedTransaction?.gst }}</li>
-        </ul>
+        <h6 class="mt-4">Charge Breakdown</h6>
+        <div class="text-muted">
+          <div class="d-flex justify-content-between">
+            <span>Brokerage:</span> <span>₹{{ selectedTransaction?.brokerage }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>Exchange Txn Charges:</span> <span>₹{{ selectedTransaction?.exchangeTxnCharges }}</span>
+          </div>
+          <div *ngIf="selectedTransaction?.transactionType === 'BUY'" class="d-flex justify-content-between">
+            <span>Stamp Duty:</span> <span>₹{{ selectedTransaction?.stampDuty }}</span>
+          </div>
+          <div *ngIf="selectedTransaction?.transactionType === 'SELL'" class="d-flex justify-content-between">
+            <span>Stamp Duty:</span> <span class="text-danger">₹{{ selectedTransaction?.stampDuty }} (excluded)</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>IPFT:</span> <span>₹{{ selectedTransaction?.ipft }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>SEBI Charges:</span> <span>₹{{ selectedTransaction?.sebiCharges }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>STT:</span> <span>₹{{ selectedTransaction?.stt }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>GST:</span> <span>₹{{ selectedTransaction?.gst }}</span>
+          </div>
+        </div>
 
         <hr>
 
-        <p><strong>Total Amount:</strong><br />
-          ₹{{ selectedTransaction?.subTotal }} 
-          + ₹{{ selectedTransaction?.brokerage }} 
-          + ₹{{ selectedTransaction?.exchangeTxnCharges }} 
-          <span *ngIf="selectedTransaction?.transactionType === 'BUY'"> + ₹{{ selectedTransaction?.stampDuty }}</span>
-          <span *ngIf="selectedTransaction?.transactionType === 'SELL'" class="text-danger"> + ₹{{ selectedTransaction?.stampDuty }} (excluded)</span>
-          + ₹{{ selectedTransaction?.ipft }} 
-          + ₹{{ selectedTransaction?.sebiCharges }} 
-          + ₹{{ selectedTransaction?.stt }} 
-          + ₹{{ selectedTransaction?.gst }} 
-          = <strong>₹{{ selectedTransaction?.totalAmount }}</strong>
-        </p>
+        <div class="d-flex justify-content-between fw-bold">
+          <span>Total Amount:</span>
+          <span>₹{{ selectedTransaction?.totalAmount }}</span>
+        </div>
 
-        <p class="text-muted"><strong>Date & Time:</strong> {{ selectedTransaction?.timestamp | date: 'dd/MM/yyyy HH:mm' }}</p>
+        <p class="text-muted mt-2 mb-0"><strong>Date & Time:</strong> {{ selectedTransaction?.timestamp | date: 'dd/MM/yyyy HH:mm' }}</p>
+
       </div>
     </div>
   </div>

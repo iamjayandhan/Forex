@@ -30,7 +30,7 @@ export class SellComponent implements OnInit {
   isPlacingSellOrder: boolean = false;
   showConfirmModal: boolean = false;
 
-  readonly SELL_LIMIT = 50000;
+  readonly SELL_LIMIT = 100000;
 
   constructor(
     public router: Router,
@@ -72,7 +72,6 @@ export class SellComponent implements OnInit {
 
   onQuantityChange(value: number) {
     if (value < 1 || !Number.isInteger(value)) {
-      this.notyf.error('Quantity must be a positive integer');
       this.quantity = 0;
     } 
     else if(value> this.stock.quantity) {

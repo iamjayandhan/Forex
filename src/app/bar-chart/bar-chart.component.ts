@@ -48,12 +48,14 @@ interface Holding {
 })
 export class BarChartComponent implements OnInit {
   @ViewChild('chart') chart!: ChartComponent;
-  public chartOptions!: Partial<BarChartOptions>;
-
+  public chartOptions?: Partial<BarChartOptions>;
+  
   constructor(
     private portfolioService: PortfolioService,
     private userService: UserService
   ) {}
+
+  public hasHoldings: boolean = false;
 
   ngOnInit(): void {
     this.userService.currentUser$.subscribe(user => {
@@ -79,12 +81,19 @@ export class BarChartComponent implements OnInit {
         .sort((a, b) => (b.profit ?? 0) - (a.profit ?? 0))
         .slice(0, 3);
 
+      this.hasHoldings = holdings.length > 0;
+
+      if (!this.hasHoldings) {
+        this.chartOptions = undefined;
+        return;
+      }
+
       const stockNames = holdings.map(h => h.stock.name);
       const investmentData = holdings.map(h => +(h.investment ?? 0).toFixed(2));
       const profitData = holdings.map(h => +(h.profit ?? 0).toFixed(2));
 
       this.chartOptions = {
-        chart: { type: 'bar', height: 260, width: 600, toolbar: { show: true } },
+        chart: { type: 'bar', height: 260, width: 600, toolbar: { show: true },stacked:true },
         plotOptions: {
           bar: { horizontal: true, dataLabels: { position: 'top' }, barHeight: '40%' },
         },
@@ -102,7 +111,7 @@ export class BarChartComponent implements OnInit {
             return '';
           },
           offsetX: -15,
-          style: { colors: ['#1e293b'], fontWeight: '600', fontSize: '12px' },
+          style: { colors: ['black'], fontWeight: '600', fontSize: '12px' },
         },
         series: [
           { name: 'Invested', data: investmentData },
@@ -112,7 +121,7 @@ export class BarChartComponent implements OnInit {
           categories: stockNames,
           title: {
             text: 'Amount (₹)',
-            style: { fontWeight: 'bold', fontSize: '14px', color: '#334155' },
+            style: { fontWeight: 'bold', fontSize: '14px', color: 'red' },
           },
           labels: {
             formatter: val => {
@@ -141,6 +150,7 @@ export class BarChartComponent implements OnInit {
               }
             }
           },
+          
         },
         title: {
           text: 'Top 3 Stocks by Profit',

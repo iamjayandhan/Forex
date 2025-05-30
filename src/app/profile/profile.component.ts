@@ -1,89 +1,74 @@
-import { Component, Input,Output,EventEmitter, OnChanges,SimpleChanges, OnInit } from '@angular/core';
+// profile.component.ts
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NotyfService } from '../services/notyf.service';
-import { CommonModule } from '@angular/common';
+import { UserProfile } from '../models/user-profile.model'; // Your interface
 import { UserService } from '../services/user.service';
-import { UserProfile } from '../models/user-profile.model';
-import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { NotyfService } from '../services/notyf.service';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
   standalone:true,
-  imports:[CommonModule,ReactiveFormsModule]
+  imports: [ReactiveFormsModule, CommonModule]
 })
-export class ProfileComponent implements OnInit{
+export class ProfileComponent implements OnInit {
+  user!: UserProfile;
+  profileForm!: FormGroup;
+  isEditing = false;
 
-  profileForm: FormGroup;
-  showModal = false;
-  user: UserProfile | null = null;
+  constructor(private fb: FormBuilder, private userService: UserService, private notyf: NotyfService) {}
 
-  constructor(
-    private fb: FormBuilder, 
-    private notyf: NotyfService,
-    private userService: UserService,
-    private router: Router
-  ) {
-    this.profileForm = this.fb.group({
-      email: [{ value: '', disabled: true }],
-      fullName: ['',Validators.required],
-      mobileNumber: ['',[Validators.required, Validators.pattern('^[1-9][0-9]{9}$')]],
-      dateOfBirth: ['', Validators.required],
+  ngOnInit(): void {
+    this.loadUser();
+  }
+
+  loadUser(): void {
+    this.userService.currentUser$.subscribe(userData => {
+      if (userData) {
+        this.user = userData;
+        this.initForm();
+      }
+    });
+    this.userService.getUserProfile().subscribe(res => {
+      this.userService.setUser(res.data);
     });
   }
 
-  ngOnInit(): void {
-    this.userService.currentUser$.subscribe((userData) => {
-      if (userData) {
-        this.user = userData;
-        this.profileForm.patchValue({
-          email: userData.email,
-          fullName: userData.fullName,
-          mobileNumber: userData.mobileNumber,
-          dateOfBirth: userData.dateOfBirth
-        });
-      }
+  initForm() {
+    this.profileForm = this.fb.group({
+      fullName: [this.user.fullName, Validators.required],
+      dateOfBirth: [this.user.dateOfBirth, Validators.required],
+      mobileNumber: [this.user.mobileNumber, Validators.required]
     });
+  }
 
-    // Fetch if user data is not already available
-    if (!this.userService.getUser()) {
-      this.userService.getUserProfile().subscribe((data) => {
-        this.userService.setUser(data);
-      });
+  toggleEdit() {
+    this.isEditing = !this.isEditing;
+    if (this.isEditing) {
+      this.initForm(); // Reset form with current user data when entering edit mode
     }
+  }
+
+  cancelEdit() {
+    this.isEditing = false;
   }
 
   onSubmit() {
-    const payload = {
-      email: this.profileForm.getRawValue().email,
+    if (this.profileForm.invalid) return;
+
+    const updatedProfile = {
+      ...this.user,
       fullName: this.profileForm.value.fullName,
-      mobileNumber: this.profileForm.value.mobileNumber,
-      dateOfBirth: this.profileForm.value.dateOfBirth
+      dateOfBirth: this.profileForm.value.dateOfBirth,
+      mobileNumber: this.profileForm.value.mobileNumber
     };
 
-    console.log("Payload for update:", payload);
-
-    this.userService.updateUserProfile(payload).subscribe({
-      next: () => {
-        // this.notyf.success("Profile updated successfully!");
-      },
-      error: (err) =>{
-        this.notyf.error(err);
-      },
-    })
-  }
-
-  onCancel() {
-    this.showModal = false;
-
-    const role = this.userService.getUser()?.role;
-
-    if( role === 'ADMIN'){
-      this.router.navigate(['/admin']);
-    }
-    else{
-      this.router.navigate(['/portfolio']);
-    }
+    this.userService.updateUserProfile(updatedProfile).subscribe(() => {
+      this.user = updatedProfile;
+      this.isEditing = false;
+      this.notyf.success("Profile updated successfully.");
+    });
   }
 }

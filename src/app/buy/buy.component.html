@@ -41,7 +41,7 @@
   <h6 class="text-muted mb-2">
     <i class="bi bi-info-circle-fill"></i> Note:  
     - Quantity cannot exceed the market's IPO Quantity.  
-    - Maximum transaction value per order is ₹50,000, except for high-priced stocks where buying 1 quantity is allowed regardless of price.
+    - Maximum transaction value per order is ₹1,00,000, except for high-priced stocks where buying 1 quantity is allowed regardless of price.
   </h6>
 
   <h6 class="mb-2">
@@ -241,7 +241,8 @@
           <button
             type="button"
             class="btn btn-success"
-            [disabled]="isPlacingOrder"
+            data-bs-dismiss="modal"
+            [disabled]="isPlacingOrder || enteredMPIN.length < 4"
             (click)="handleModalConfirm()"
           >
             {{ isPlacingOrder ? 'Placing Order...' : 'Confirm Buy' }}

@@ -18,3 +18,9 @@
   fill: black !important;
   color: black !important;
 }
+
+::ng-deep .apexcharts-tooltip {
+  color: #1e293b !important;
+  background-color: #e2e8f0 !important;
+  font-weight: 600;
+}

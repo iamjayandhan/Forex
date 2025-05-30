@@ -31,6 +31,10 @@ export class LoginComponent {
     this.showPassword = !this.showPassword;
   }
 
+  goToHome() : any{
+    this.router.navigate(['/home']);
+  }
+
   onSubmit() {
     if (this.email && this.password) {
       this.authService.login({ email: this.email, password: this.password }).subscribe({

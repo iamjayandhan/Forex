@@ -243,9 +243,11 @@ export class AdminComponent implements OnInit {
         this.notyf.success('Stock deleted successfully');
         this.fetchStocks();
       },
-      error: () => {
-        this.error = 'Failed to delete stock';
-        this.notyf.error(this.error);
+      error: (err) => {
+        // this.error = 'Failed to delete stock';
+        // this.error = err.message;
+        this.notyf.error("Some Investors hold that stock currently. Cannot perform deletion operation.");
+        this.fetchStocks();
       }
     });
   }

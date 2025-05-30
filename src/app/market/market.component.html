@@ -56,7 +56,7 @@
               </span>
             </th>
             <th>Description</th>
-            <th (click)="onSort('currentPrice')" class="text-end" style="cursor:pointer">Price
+            <th (click)="onSort('currentPrice')" class="text-end" style="cursor:pointer">Price(₹)
               <span *ngIf="sortBy === 'currentPrice'">
                 {{ sortOrder === 'asc' ? '↑' : '↓'  }}
               </span>
@@ -81,7 +81,7 @@
             <td>{{ stock.exchange }}</td>
             <td>{{ stock.sector }}</td>
             <td class="text-truncate" style="max-width: 200px;">{{ stock.description }}</td>
-            <td class="text-success fw-bold text-end">₹{{ stock.currentPrice | number: '1.2-2' }}</td>
+            <td class="text-success fw-bold text-end">{{ stock.currentPrice | number: '1.2-2' }}</td>
             <td>
               <button class="btn btn-sm btn-outline-primary" (click)="goToBuy(stock)">Buy</button>
             </td>

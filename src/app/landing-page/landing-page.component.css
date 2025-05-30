@@ -1,0 +1,89 @@
+/* forex-landing.component.css */
+.dark-blue-theme {
+  background: linear-gradient(135deg, #2f517b, #1b2838, #253447);
+  color: #e0e1dd;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+img {
+  object-fit: cover;
+}
+
+.navbar {
+  background: rgba(18, 18, 18, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.navbar-nav .nav-link {
+  transition: background-color 0.3s, color 0.3s;
+  margin: 5px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  color: #ffffff;
+}
+
+.navbar-nav .nav-link.active {
+  background-color: #27b114;
+  color: #ffffff !important;
+  border-radius: 5px;
+}
+
+.navbar-nav .nav-link:not(.active):hover {
+  background-color: #557abb;
+  color: #ffffff;
+  border-radius: 5px;
+}
+
+.navbar-brand {
+  cursor: pointer;
+}
+
+@keyframes floatGlow {
+  0% {
+    transform: translateY(0px);
+    box-shadow: 0 0 20px 8px rgba(0, 255, 255, 0.3);
+  }
+  50% {
+    transform: translateY(-10px);
+    box-shadow: 0 0 40px 4px rgba(0, 255, 255, 0.6);
+  }
+  100% {
+    transform: translateY(0px);
+    box-shadow: 0 0 20px 8px rgba(0, 255, 255, 0.3);
+  }
+}
+
+.glow-wrapper {
+  display: inline-block;
+  border-radius: 2rem;
+  width: 70%;
+  animation: floatGlow 3s ease-in-out infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-link:hover {
+  color: #00dfd8 !important;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+footer i {
+  transition: transform 0.3s, color 0.3s;
+}
+
+footer i:hover {
+  color: #00dfd8;
+  transform: scale(1.2);
+}

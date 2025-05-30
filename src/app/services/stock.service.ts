@@ -43,27 +43,36 @@ export class StockService {
     if (search.trim() !== '') {
       params.search = search;
     }
-    return this.http.get<any>(`${environment.apiUrl}/stocks/paginated`,{ params});
+    return this.http.get<any>(`${environment.apiUrl}/stocks/paginated`,{ withCredentials:true,params});
   }
 
   // GET: fetch stock by ID
   getStockById(id: number): Observable<any> {
-    return this.http.get(`${environment.apiUrl}/stocks/${id}`).pipe(catchError(this.handleError));
+    return this.http.get(`${environment.apiUrl}/stocks/${id}`,{withCredentials:true}).pipe(catchError(this.handleError));
   }
 
-  // POST: create a new stock
-  createStock(stock: Stock): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/stocks`, stock).pipe(catchError(this.handleError));
-  }
+createStock(stock: Stock): Observable<any> {
+  console.log("Creating stock with data:", stock);
+  return this.http.post(`${environment.apiUrl}/stocks`, stock, {
+    withCredentials: true,
+  }).pipe(
+    catchError((error) => {
+      console.error("Error occurred during createStock:", error);
+      return this.handleError(error);
+    })
+  );
+}
+
 
   // PUT: partial update of stock
   updateStock(id: number, stock: Partial<Stock>): Observable<any> {
-    return this.http.put(`${environment.apiUrl}/stocks/${id}`, stock).pipe(catchError(this.handleError));
+    console.log(stock);
+    return this.http.put(`${environment.apiUrl}/stocks/${id}`,stock ,{withCredentials:true}).pipe(catchError(this.handleError));
   }
 
   // DELETE: remove a stock
   deleteStock(id: number): Observable<any> {
-    return this.http.delete(`${environment.apiUrl}/stocks/${id}`).pipe(catchError(this.handleError));
+    return this.http.delete(`${environment.apiUrl}/stocks/${id}`,{withCredentials:true}).pipe(catchError(this.handleError));
   }
 
   // Error handling

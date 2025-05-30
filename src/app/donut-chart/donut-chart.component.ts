@@ -33,13 +33,15 @@ export type ChartOptions = {
 })
 export class DonutChartComponent implements OnInit {
   @ViewChild('chart') chart!: ChartComponent;
-  public chartOptions: Partial<ChartOptions> = {};
+  public chartOptions?: Partial<ChartOptions> = {};
   user: UserProfile | null = null;
 
   constructor(
     private portfolioService: PortfolioService,
     private userService: UserService
   ) {}
+
+  public hasHoldings: boolean = false;
 
   ngOnInit(): void {
     this.userService.currentUser$.subscribe((userData) => {
@@ -73,6 +75,13 @@ export class DonutChartComponent implements OnInit {
 
       const labels = Array.from(sectorMap.keys());
       const series = Array.from(sectorMap.values());
+
+      this.hasHoldings = data.length > 0;
+
+      if (!this.hasHoldings) {
+        this.chartOptions = undefined;
+        return;
+      }
 
       this.chartOptions = {
         series: series,

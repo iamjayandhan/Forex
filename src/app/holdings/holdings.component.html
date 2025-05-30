@@ -1,76 +1,70 @@
-<div class="dark-blue-theme pb-2">
-  <h1 class="ms-4 pt-4">Portfolio</h1>
+<div class="dark-blue-theme">
+  <!-- <h1 class="ms-4 pt-4">Portfolio</h1> -->
 
-  <div
-  class="m-4 p-4 rounded shadow-sm text-white"
-  [ngClass]="{
-    'bg-success border-success': totalProfitLoss > 0,
-    'bg-danger border-danger': totalProfitLoss < 0,
-    'bg-secondary border-secondary': isNeutral()
-  }"
-  style="transition: background-color 0.5s ease, border-color 0.5s ease;"
-  *ngIf="holdings.length > 0"
->
-  <h2 class="fw-bold pb-4 text-center">Portfolio Summary</h2>
+  <div class="container my-5 mt-0 pt-5">
+    <div class="bg-white text-dark rounded shadow-lg p-4 custom-card">
+      <h2 class="fw-bold text-center mb-4">Portfolio Summary</h2>
 
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
 
-    <!-- Total Value -->
-    <div class="col">
-      <div class="card text-dark text-center shadow-sm h-100">
-        <div class="card-body">
-          <h6 class="card-title text-muted">Total Value</h6>
-          <h5 class="card-text text-success">₹{{ totalValue | number:'1.2-2' }}</h5>
+        <!-- Total Value -->
+        <div class="col">
+          <div class="card text-center custom-card h-100 border-0">
+            <div class="card-body custom-card">
+              <h6 class="card-title text-muted">Total Value</h6>
+              <h5 class="card-text text-success fw-semibold">₹{{ totalValue | number:'1.2-2' }}</h5>
+            </div>
+          </div>
         </div>
+
+
+        <!-- Total Invested -->
+        <div class="col">
+          <div class="card text-center custom-card h-100 border-0">
+            <div class="card-body custom-card">
+              <h6 class="card-title text-muted">Total Invested</h6>
+              <h5 class="card-text fw-semibold">₹{{ totalInvested | number:'1.2-2' }}</h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Profit / Loss -->
+        <div class="col">
+          <div
+            class="card text-center h-100 border-0 custom-card"
+            [ngClass]="{
+              'text-success': totalProfitLoss > 0,
+              'text-danger': totalProfitLoss < 0,
+              'text-muted': isNeutral()
+            }"
+          >
+            <div class="card-body custom-card">
+              <h6 class="card-title text-muted">Total Profit / Loss</h6>
+              <h5 class="card-text fw-semibold">₹{{ totalProfitLoss | number:'1.2-2' }}</h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profit / Loss (%) -->
+        <div class="col">
+          <div
+            class="card text-center shadow-sm h-100 border-0 custom-card"
+            [ngClass]="{
+              'text-success': profitLossPercent > 0,
+              'text-danger': profitLossPercent < 0,
+              'text-muted': profitLossPercent === 0
+            }"
+          >
+            <div class="card-body custom-card">
+              <h6 class="card-title text-muted">Overall Change</h6>
+              <h5 class="card-text fw-semibold">{{ profitLossPercent | number:'1.2-2' }}%</h5>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
-
-    <!-- Total Invested -->
-    <div class="col">
-      <div class="card text-dark text-center shadow-sm h-100">
-        <div class="card-body">
-          <h6 class="card-title text-muted">Total Invested</h6>
-          <h5 class="card-text">₹{{ totalInvested | number:'1.2-2' }}</h5>
-        </div>
-      </div>
-    </div>
-
-    <!-- Total Profit / Loss -->
-    <div class="col">
-      <div
-        class="card text-center shadow-sm h-100"
-        [ngClass]="{
-          'text-success': totalProfitLoss > 0,
-          'text-danger': totalProfitLoss < 0,
-          'text-muted': isNeutral()
-        }"
-      >
-        <div class="card-body">
-          <h6 class="card-title text-muted">Total Profit / Loss</h6>
-          <h5 class="card-text">₹{{ totalProfitLoss | number:'1.2-2' }}</h5>
-        </div>
-      </div>
-    </div>
-
-    <!-- Profit / Loss (%) -->
-    <div class="col">
-      <div
-        class="card text-center shadow-sm h-100"
-        [ngClass]="{
-          'text-success': profitLossPercent > 0,
-          'text-danger': profitLossPercent < 0,
-          'text-muted': profitLossPercent === 0
-        }"
-      >
-        <div class="card-body">
-          <h6 class="card-title text-muted">Overall Change</h6>
-          <h5 class="card-text">{{ profitLossPercent | number:'1.2-2' }}%</h5>
-        </div>
-      </div>
-    </div>
-
   </div>
-</div>
 
   <div class="charts-container">
     <app-donut-chart></app-donut-chart>
@@ -118,12 +112,12 @@
                 {{ sortOrder === 'asc' ? '↑' : '↓' }}
               </span>
             </th>
-            <th (click)="onSort('avgPrice')">Buy Price
+            <th (click)="onSort('avgPrice')">Buy Price(₹)
               <span *ngIf="sortBy === 'avgPrice'">
                 {{ sortOrder === 'asc' ? '↑' : '↓' }}
               </span>
             </th>
-            <th (click)="onSort('stock.currentPrice')">Market price
+            <th (click)="onSort('stock.currentPrice')">Market price(₹)
               <span *ngIf="sortBy === 'stock.currentPrice'">
                 {{ sortOrder === 'asc' ? '↑' : '↓' }}
               </span>
@@ -146,8 +140,8 @@
             <td class="text-center">{{ holding.stock.symbol }}</td>
             <td>{{ holding.stock.sector }}</td>
             <td class="text-center">{{ holding.quantity }}</td>
-            <td class="text-end">₹{{ holding.avgPrice | number:'1.2-2' }}</td>
-            <td class="text-end">₹{{ holding.stock.currentPrice | number:'1.2-2' }}</td>
+            <td class="text-end">{{ holding.avgPrice | number:'1.2-2' }}</td>
+            <td class="text-end">{{ holding.stock.currentPrice | number:'1.2-2' }}</td>
             <td class="text-end">
               <span *ngIf="holding.profitLossAmount != null && holding.profitLossPercent != null"
                     [ngClass]="{

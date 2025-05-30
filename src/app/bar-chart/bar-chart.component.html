@@ -1,14 +1,17 @@
-<div *ngIf="chartOptions" class="chart-card">
-  <apx-chart
-    #chart
-    [series]="chartOptions.series!"
-    [chart]="chartOptions.chart!"
-    [plotOptions]="chartOptions.plotOptions!"
-    [dataLabels]="chartOptions.dataLabels!"
-    [xaxis]="chartOptions.xaxis!"
-    [yaxis]="chartOptions.yaxis!"
-    [legend]="chartOptions.legend!"
-    [tooltip]="chartOptions.tooltip!"
-    [title]="chartOptions.title!"
-  ></apx-chart>
+<div class="custom-card">
+  <div *ngIf="chartOptions" class="chart-card">
+    <apx-chart
+      #chart
+      [series]="chartOptions.series!"
+      [chart]="chartOptions.chart!"
+      [plotOptions]="chartOptions.plotOptions!"
+      [dataLabels]="chartOptions.dataLabels!"
+      [xaxis]="chartOptions.xaxis!"
+      [yaxis]="chartOptions.yaxis!"
+      [legend]="chartOptions.legend!"
+      [tooltip]="chartOptions.tooltip!"
+      [title]="chartOptions.title!"
+    ></apx-chart>
+  </div>
+
 </div>

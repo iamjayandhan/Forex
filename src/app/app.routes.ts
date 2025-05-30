@@ -14,9 +14,11 @@ import { HoldingsComponent } from './holdings/holdings.component';
 import { GuideComponent } from './guide/guide.component';
 import { SellComponent } from './sell/sell.component';
 import { ProfileComponent } from './profile/profile.component';
+import { LandingPageComponent } from './landing-page/landing-page.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'home', component: LandingPageComponent, canActivate:[loggedInGuard]},
   { path: 'login', component: LoginComponent , canActivate: [loggedInGuard]},
   { path: 'register', component:RegisterComponent, canActivate: [loggedInGuard]},
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard]},

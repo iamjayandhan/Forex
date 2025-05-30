@@ -126,3 +126,32 @@
   color: #fff;
 }
 
+/* Floating animation */
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+.floating-text {
+  font-family: 'Poppins', sans-serif;
+  animation: float 3s ease-in-out infinite;
+  color: #ffffff;
+  text-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+  transition: transform 0.3s ease;
+}
+
+.floating-text:hover {
+  transform: scale(1.05);
+}
+
+/* Fade-in effect */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-text {
+  animation: fadeIn 2s ease-in forwards;
+  opacity: 0; /* Start hidden, reveal on load */
+}
