@@ -65,9 +65,28 @@ export class HoldingsComponent implements OnInit {
     private router: Router,
   ) {}
 
+  activeTab: 'summary' | 'holdings' = 'summary';
+
   ngOnInit(): void {
     this.loadUser();
   }
+
+  summaryCards = [
+    { label: 'Total Value', value: `₹${this.totalValue.toFixed(2)}`, class: 'text-success' },
+    { label: 'Total Invested', value: `₹${this.totalInvested.toFixed(2)}`, class: '' },
+    { label: 'Total Profit / Loss', value: `₹${this.totalProfitLoss.toFixed(2)}`, class: this.totalProfitLoss > 0 ? 'text-success' : (this.totalProfitLoss < 0 ? 'text-danger' : 'text-muted') },
+    { label: 'Overall Change', value: `${this.profitLossPercent.toFixed(2)}%`, class: this.profitLossPercent > 0 ? 'text-success' : (this.profitLossPercent < 0 ? 'text-danger' : 'text-muted') },
+  ];
+
+  tableHeaders = [
+    { label: 'Name', key: 'stock.name' },
+    { label: 'Symbol', key: 'stock.symbol' },
+    { label: 'Industry', key: 'stock.sector' },
+    { label: 'Units', key: 'quantity' },
+    { label: 'Buy Price(₹)', key: 'avgPrice' },
+    { label: 'Market Price(₹)', key: 'stock.currentPrice' }
+  ];
+
 
   loadUser(): void {
     this.userService.currentUser$.subscribe((userData) => {

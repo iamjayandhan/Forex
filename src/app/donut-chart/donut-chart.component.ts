@@ -62,7 +62,7 @@ export class DonutChartComponent implements OnInit {
   loadHoldings(userId: number): void {
     this.portfolioService.getHoldings(userId).subscribe((response) => {
       const data = response.data;
-      console.log('Holdings data:', data);
+      // console.log('Holdings data:', data);
 
       const sectorMap = new Map<string, number>();
 
@@ -87,8 +87,8 @@ export class DonutChartComponent implements OnInit {
         series: series,
         chart: {
           type: 'donut',
-          width: 400,
-          height: 400  
+          width: 350,
+          height: 350  
         },
          title: {
           text: 'Investment by Sector',

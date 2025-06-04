@@ -35,6 +35,8 @@ export class WalletComponent implements OnInit {
     private portfolioService: PortfolioService,
   ) {}
 
+  activeTab = 'wallet';
+
   ngOnInit(): void {
     this.userService.currentUser$.subscribe((userData) => {
       this.user = userData;

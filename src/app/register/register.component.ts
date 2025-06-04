@@ -4,6 +4,9 @@ import { AuthService } from '../services/auth.service'; // Import the AuthServic
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NotyfService } from '../services/notyf.service';
+import { EmailService } from '../services/email.service';
+
+declare var bootstrap : any;
 
 @Component({
   selector: 'app-register',
@@ -26,12 +29,22 @@ export class RegisterComponent {
 
   showPassword: boolean = false;
   showMPIN: boolean = false;
+
+  isSendingOTP: boolean = false;
+  otpCooldown: boolean = false;
+  cooldownTimeLeft: number = 60;
+  timerInterval: any;
+
   showModal = false;
+
+  otp: string = '';
+  emailVerified = false;
 
   constructor(
     private authService: AuthService, 
     private router: Router,
-    private notyf: NotyfService
+    private notyf: NotyfService,
+    private emailService : EmailService
   ) {}
 
   passwordValidations = {
@@ -77,7 +90,84 @@ export class RegisterComponent {
     this.showMPIN = !this.showMPIN;
   }
 
+  sendOTP() {
+    if (!this.email) {
+      this.errorMsg = 'Email is required to send OTP.';
+      return;
+    }
+
+    this.isSendingOTP = true;
+
+    const otpRequest = { email: this.email };
+
+    this.emailService.sendEmailVerificationOtp(otpRequest).subscribe({
+      next: () => {
+        const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+        otpModal.show();
+
+        this.startCooldownTimer(); 
+
+        this.notyf.success('OTP sent to your email!');
+        this.isSendingOTP = false;
+      },
+      error: (err) => {
+        this.errorMsg = err.error?.message || 'Failed to send OTP. Try again.';
+        this.notyf.error(this.errorMsg);
+        this.isSendingOTP = false;
+      }
+    });
+  }
+
+
+  verifyOTP() {
+    if (!this.email || !this.otp) {
+      this.errorMsg = 'Email and OTP are required for verification.';
+      return;
+    }
+
+    const otpVerification = { email: this.email, otp: this.otp };
+
+    this.emailService.verifyEmailVerificationOtp(otpVerification).subscribe({
+      next: (res: any) => {
+        if (res.status == 200) {
+          this.emailVerified = true;
+          const otpModal = bootstrap.Modal.getInstance(document.getElementById('otpModal'));
+          otpModal.hide();
+          this.notyf.success('Email verified successfully!');
+        } else {
+          this.errorMsg = 'Invalid OTP. Please try again.';
+          this.notyf.error(this.errorMsg);
+        }
+      },
+      error: (err) => {
+        this.errorMsg = err.error?.message || 'Verification failed. Try again.';
+        this.notyf.error(this.errorMsg);
+      }
+    });
+  }
+
+  startCooldownTimer() {
+    this.otpCooldown = true;
+    this.cooldownTimeLeft = 60;
+
+    this.timerInterval = setInterval(() => {
+      this.cooldownTimeLeft--;
+
+      if (this.cooldownTimeLeft <= 0) {
+        clearInterval(this.timerInterval);
+        this.otpCooldown = false;
+      }
+    }, 1000);
+  }
+
+
   onSubmit() {
+
+    if (!this.emailVerified) {
+      this.errorMsg = 'Please verify your email before registering.';
+      return;
+    }
+
      if (!this.dateOfBirth) {
       this.errorMsg = "Date of Birth is required.";
       return;
@@ -118,11 +208,27 @@ export class RegisterComponent {
   }
 
   dobInvalid() {
+    if (!this.dateOfBirth) return true; // or false, depending on how you want to handle empty
+
     const today = new Date();
     const dob = new Date(this.dateOfBirth);
+
+    // Check if DOB is in the future
+    if (dob > today) {
+      return true; // invalid if DOB is after today
+    }
+
     const age = today.getFullYear() - dob.getFullYear();
     const monthDiff = today.getMonth() - dob.getMonth();
-    
-    return (age < 18 || (age === 18 && monthDiff < 0));
+    const dayDiff = today.getDate() - dob.getDate();
+
+    if (
+      age < 18 || 
+      (age === 18 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)))
+    ) {
+      return true; // invalid if user is under 18
+    }
+    return false; // valid DOB
   }
+
 }

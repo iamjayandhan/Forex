@@ -15,6 +15,8 @@ import { GuideComponent } from './guide/guide.component';
 import { SellComponent } from './sell/sell.component';
 import { ProfileComponent } from './profile/profile.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
+import { FpxPaymentComponent } from './fpx-payment/fpx-payment.component';
+import { PaymentStatusComponent } from './payment-status/payment-status.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -32,4 +34,6 @@ export const routes: Routes = [
   { path: 'admin', component:AdminComponent, canActivate:[AuthGuard]},
   { path: 'portfolio', component: HoldingsComponent, canActivate:[AuthGuard]},
   { path: 'help', component: GuideComponent,canActivate:[AuthGuard]},
+  { path: 'fpx', component: FpxPaymentComponent},
+  { path: 'payment-status',component: PaymentStatusComponent}
 ];

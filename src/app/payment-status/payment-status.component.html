@@ -1,0 +1,18 @@
+<div class="payment-status-container" [ngClass]="{'success-box': paymentStatus === 'success', 'failure-box': paymentStatus !== 'success'}">
+  <h2>Payment Status</h2>
+
+  <div *ngIf="paymentStatus && orderNo && transactionId; else loading">
+    <p>
+      <strong>Status:</strong>
+      <span>{{ paymentStatus }}</span>
+    </p>
+    <p><strong>Order ID:</strong> {{ orderNo }}</p>
+    <p><strong>Transaction ID:</strong> {{ transactionId }}</p>
+
+    <button (click)="navigateToPortfolio()">Portfolio</button>
+  </div>
+
+  <ng-template #loading>
+    <p>Loading payment details...</p>
+  </ng-template>
+</div>

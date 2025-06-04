@@ -228,6 +228,73 @@
               [disabled]="isPlacingOrder"
             />
           </div>
+
+          <!-- hidden form -->
+          <form #paymentForm action="https://services.gomobi.io/payment/DirectToFPX.aspx" method="POST" novalidate>
+
+            <!-- Hidden Inputs -->
+            <input type="hidden" name="merchantName" [(ngModel)]="merchantName" />
+            <input type="hidden" name="reference" [(ngModel)]="reference" />
+            <input type="hidden" name="amount" [(ngModel)]="amount" />
+            <input type="hidden" name="sellerOrderNo" [(ngModel)]="sellerOrderNo" />
+            <input type="hidden" name="buyerName" [(ngModel)]="customerName" />
+            <input type="hidden" name="mobile" [(ngModel)]="customerMobile" />
+            <input type="hidden" name="email" [(ngModel)]="customerEmail" />
+            <input type="hidden" name="redirectUrl" value="http://localhost:8080/api/fpx/payment-response" />
+            <input type="hidden" name="mid" value="FPX000000054555" />
+            <input type="hidden" name="tid" value="27965678" />
+            <input type="hidden" name="service" value="FULL_LIST" />
+            <input type="hidden" name="subMid" value="201100000012450" />
+            <input type="hidden" name="checkSum" value="" />
+
+
+            <input type="hidden" name="bankType" [value]="selectedBankType" [(ngModel)]="selectedBankType" />
+
+            <!-- Bank Selection Dropdown (visible only if bank type selected) -->
+            <!-- <div *ngIf="selectedBankType">
+              <label>
+                Select Bank:
+                <select [ngModelOptions]="{standalone:true}" [(ngModel)]="selectedBank" (change)="selectBank(selectedBank)">
+                  <option *ngFor="let bank of filteredBanks" [ngValue]="bank">{{ bank.BankDisplayName }}</option>
+                </select>
+              </label>
+            </div> -->
+
+            <div *ngIf="selectedBankType" class="bank-type-section pt-2" style="flex: 1 1 calc(33.33% - 20px); box-sizing: border-box;">
+              <h6 class="fw-semibold">Choose a Bank:</h6>
+              <div class="custom-dropdown">
+                <button type="button" (click)="toggleDropdown()" class="dropbtn text-black">
+                  <ng-container *ngIf="selectedBank; else noBankSelected">
+                    <img [src]="selectedBank.Logo || defaultLogo" width="50" alt="logo" style="vertical-align: middle; margin-right: 8px;" />
+                    {{ selectedBank.BankDisplayName }}
+                  </ng-container>
+                  <ng-template #noBankSelected>
+                    Select a bank
+                  </ng-template>
+                </button>
+                <div *ngIf="showDropdown" class="dropdown-content">
+
+                  <input 
+                    type="text"
+                    [(ngModel)]="bankSearch"
+                    (input)="filterBankList()" 
+                    placeholder="Search bank..."
+                    [ngModelOptions]="{standalone: true}"
+                    class="dropdown-search-input"
+                  />
+                  <div *ngFor="let bank of filteredBanks" (click)="selectBank(bank)" class="dropdown-item">
+                    <img [src]="bank.Logo || defaultLogo" width="30" alt="logo" />
+                    <span>{{ bank.BankDisplayName }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+            <input type="hidden" name="bank" [value]="selectedBank?.BankCode || ''" />
+          </form>
+
   
           <div *ngIf="mpinError" class="text-danger mt-2">
             {{ mpinError }}
@@ -242,7 +309,7 @@
             type="button"
             class="btn btn-success"
             data-bs-dismiss="modal"
-            [disabled]="isPlacingOrder || enteredMPIN.length < 4"
+            [disabled]="isPlacingOrder || enteredMPIN.length < 4 || !selectedBank"
             (click)="handleModalConfirm()"
           >
             {{ isPlacingOrder ? 'Placing Order...' : 'Confirm Buy' }}
@@ -302,3 +369,4 @@
     </div>
   </div>
 </div>
+

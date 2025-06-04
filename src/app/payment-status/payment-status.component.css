@@ -1,0 +1,33 @@
+/* Center container horizontally and vertically */
+.payment-status-container {
+  max-width: 400px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+
+  /* Center vertically */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Green outline and text for success */
+.success-box {
+  border: 3px solid green;
+  color: green;
+}
+
+/* Red outline and text for failure */
+.failure-box {
+  border: 3px solid red;
+  color: red;
+}
+
+/* Style the loading text differently */
+.loading {
+  color: gray;
+}

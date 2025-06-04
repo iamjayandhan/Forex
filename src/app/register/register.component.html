@@ -23,10 +23,33 @@
     <!-- Right Section: Registration Form -->
     <div class="col-12 col-lg-6 d-flex justify-content-center align-items-center">
       <div class="card p-4 shadow-lg border-0" style="width: 90%; max-width: 420px; background-color: #1e2a38; color: #e0e1dd; border-radius: 1rem; max-height: 90vh; overflow-y: auto;">
-
+        
         <!-- Registration Form -->
         <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="needs-validation" novalidate>
-
+          
+          <!-- Full Name -->
+          <div class="mb-3">
+            <label for="fullName" class="form-label fw-semibold text-light">Full Name</label>
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              class="form-control bg-dark text-white border-secondary"
+              [(ngModel)]="fullName"
+              #fullNameField="ngModel"
+              pattern="^[A-Za-z]+( [A-Za-z]+)*$"
+              required
+              placeholder="Enter Full Name">
+            <div *ngIf="fullNameField.errors && (fullNameField.touched || registerForm.submitted)" class="text-danger small mt-1">
+              <div *ngIf="fullNameField.errors['required']">
+                Full Name is required.
+              </div>
+              <div *ngIf="fullNameField.errors['pattern']">
+                Full Name must contain only letters and spaces.
+              </div>
+            </div>
+          </div>
+          
           <!-- User Name -->
           <div class="mb-3">
             <label for="username" class="form-label fw-semibold text-light">User Name</label>
@@ -36,28 +59,73 @@
               name="username"
               class="form-control bg-dark text-white border-secondary"
               [(ngModel)]="username"
+              #usernameField="ngModel"
               required
+              pattern="^[a-zA-Z][a-zA-Z0-9_]{2,14}$"
               placeholder="Enter User Name">
-            <div *ngIf="registerForm.controls['username']?.invalid && (registerForm.controls['username']?.touched || registerForm.submitted)" class="text-danger small mt-1">
-              User Name is required.
+            <div *ngIf="registerForm.controls['username']?.errors && (registerForm.controls['username']?.touched || registerForm.submitted)" class="text-danger small mt-1">
+              <div *ngIf="registerForm.controls?.['username']?.errors?.['required']">
+                User Name is required.
+              </div>
+              <div *ngIf="registerForm.controls?.['username']?.errors?.['pattern']">
+                User Name must start with a letter and be 3–15 characters. Only letters, numbers, and underscores are allowed.
+              </div>
             </div>
           </div>
-
+          
           <!-- Email -->
           <div class="mb-3">
             <label for="email" class="form-label fw-semibold text-light">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              class="form-control bg-dark text-white border-secondary"
-              [(ngModel)]="email"
-              required
-              placeholder="Enter Email">
-            <div *ngIf="registerForm.controls['email']?.invalid && (registerForm.controls['email']?.touched || registerForm.submitted)" class="text-danger small mt-1">
-              Email is required.
+            
+            <div class="input-group">
+              <!-- Email Input (Shrunk slightly to make room) -->
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-control bg-dark text-white border-secondary"
+                [(ngModel)]="email"
+                [readOnly]="emailVerified"
+                required
+                placeholder="Enter Email"
+                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                [ngClass]="{'is-invalid': emailRef.invalid && emailRef.touched}"
+                #emailRef="ngModel"
+                style="max-width: 85%;">
+
+              <!-- Verify Button (if not verified) -->
+              <button
+                *ngIf="!emailVerified"
+                class="btn btn-outline-info"
+                type="button"
+                (click)="sendOTP()"
+                [disabled]="emailRef.invalid || isSendingOTP">
+                {{ isSendingOTP? 'Sending...': 'Verify'}}
+              </button>
+
+              
+              <!-- Green Checkmark (if verified) -->
+              <span *ngIf="emailVerified " class="input-group-text bg-success text-white d-flex justify-content-center align-items-center" style="width: 15%;">
+                <i class="bi bi-check-lg small"></i>
+              </span>
+            </div>
+            
+            <span *ngIf="otpCooldown && !emailVerified" class="text-info small">
+              Resend in {{ cooldownTimeLeft }}s
+            </span>
+
+            <div *ngIf="email && !(emailRef.errors && emailRef.touched)" class="text-info small mt-1">
+              Please verify the above email to continue.
+            </div>
+
+
+            <!-- Validation error -->
+            <div *ngIf="emailRef.errors && emailRef.touched" class="text-danger small mt-1">
+              <div *ngIf="emailRef.errors['required']">Email is required.</div>
+              <div *ngIf="emailRef.errors['pattern']">Enter a valid email (e.g. example&#64;mail.com).</div>
             </div>
           </div>
+
 
           <!-- Password -->
           <div class="mb-3">
@@ -104,9 +172,10 @@
                 id="mpin"
                 name="mpin"
                 maxlength="4"
-                pattern="[0-9]*"
+                pattern="^[0-9]{4}$"
                 class="form-control bg-dark text-white border-secondary"
                 [(ngModel)]="mpin"
+                #mpinField="ngModel"
                 required
                 placeholder="Enter 4-digit MPIN">
               <span class="position-absolute top-50 end-0 translate-middle-y me-3" style="cursor:pointer;" (click)="toggleMPIN()">
@@ -114,25 +183,16 @@
               </span>
             </div>
             <div *ngIf="registerForm.controls['mpin']?.invalid && (registerForm.controls['mpin']?.touched || registerForm.submitted)" class="text-danger small mt-1">
-              MPIN is required.
+              <!-- MPIN is required. -->
+               <div *ngIf="registerForm?.controls?.['mpin']?.errors?.['required']">
+                  MPIN is required.
+                </div>
+                <div *ngIf="registerForm.controls['mpin']?.errors?.['pattern']">
+                  MPIN must be exactly 4 digits.
+                </div>
             </div>
           </div>
 
-          <!-- Full Name -->
-          <div class="mb-3">
-            <label for="fullName" class="form-label fw-semibold text-light">Full Name</label>
-            <input
-              type="text"
-              id="fullName"
-              name="fullName"
-              class="form-control bg-dark text-white border-secondary"
-              [(ngModel)]="fullName"
-              required
-              placeholder="Enter Full Name">
-            <div *ngIf="registerForm.controls['fullName']?.invalid && (registerForm.controls['fullName']?.touched || registerForm.submitted)" class="text-danger small mt-1">
-              Full Name is required.
-            </div>
-          </div>
 
           <!-- Mobile Number -->
           <div class="mb-3">
@@ -143,11 +203,15 @@
               name="mobileNumber"
               class="form-control bg-dark text-white border-secondary"
               [(ngModel)]="mobileNumber"
+              pattern="^[6-9][0-9]{9}$"
               required
+              #mobileRef="ngModel"
               placeholder="Enter Mobile Number">
-            <div *ngIf="registerForm.controls['mobileNumber']?.invalid && (registerForm.controls['mobileNumber']?.touched || registerForm.submitted)" class="text-danger small mt-1">
-              Mobile Number is required.
+            <div *ngIf="mobileRef.errors && (mobileRef.touched || registerForm.submitted)" class="text-danger small mt-1">
+              <div *ngIf="mobileRef.errors['required']">Mobile Number is required.</div>
+              <div *ngIf="mobileRef.errors['pattern']">Enter a valid 10-digit Indian mobile number starting with 6-9.</div>
             </div>
+
           </div>
 
           <!-- Date of Birth -->
@@ -160,14 +224,19 @@
               class="form-control bg-dark text-white border-secondary"
               [(ngModel)]="dateOfBirth"
               required>
-            <div *ngIf="registerForm.controls['dateOfBirth']?.invalid && (registerForm.controls['dateOfBirth']?.touched || registerForm.submitted)" class="text-danger small mt-1">
-              Date of Birth is required.
+            <div *ngIf="(registerForm.controls['dateOfBirth']?.touched || registerForm.submitted) && (registerForm.controls['dateOfBirth']?.invalid || dobInvalid())" class="text-danger small mt-1">
+              <div *ngIf="registerForm.controls['dateOfBirth']?.errors?.['required']">
+                Date of Birth is required.
+              </div>
+              <div *ngIf="!registerForm.controls['dateOfBirth']?.errors?.['required'] && dobInvalid()">
+                Date of Birth cannot be in the future and you must be at least 18 years old.
+              </div>
             </div>
           </div>
 
           <!-- Submit Button -->
           <div class="d-grid">
-            <button type="submit" class="btn btn-outline-light fw-semibold">Register</button>
+            <button type="submit" class="btn btn-outline-light fw-semibold" [disabled]="!emailVerified">Register</button>
           </div>
 
           <!-- Navigation -->
@@ -193,5 +262,29 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+ <!-- OTP Modal -->
+<div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-white" style="background-color: #1e2a38;">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="otpModalLabel">Enter OTP</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input
+          type="text"
+          maxlength="6"
+          class="form-control bg-dark text-white border-secondary"
+          [(ngModel)]="otp"
+          placeholder="Enter the OTP sent to your email" />
+      </div>
+      <div class="modal-footer border-0 d-flex justify-content-between">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success" (click)="verifyOTP()">Verify OTP</button>
+      </div>
+    </div>
   </div>
 </div>

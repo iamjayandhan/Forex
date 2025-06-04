@@ -1,0 +1,86 @@
+.market-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 1000%;
+  margin: 0 auto;
+}
+
+.market-status-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+
+.no-data {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+}
+
+.charts-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.chart-wrapper {
+  background-color: white;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  flex: 1 1 45%; /* Take up about 45% width, two per row */
+  max-width: 45%;
+  min-width: 300px; /* minimum width for better visibility on small screens */
+}
+
+/* ApexCharts black text styling */
+.market-chart .apexcharts-title-text,
+.market-chart .apexcharts-xaxis-label,
+.market-chart .apexcharts-yaxis-label,
+.market-chart .apexcharts-datalabel-label,
+.market-chart .apexcharts-tooltip-text,
+.market-chart .apexcharts-tooltip-title,
+.market-chart .apexcharts-tooltip-text,
+.market-chart .apexcharts-legend-text {
+  fill: black !important;
+  color: black !important;
+}
+
+.market-chart .apexcharts-tooltip {
+  color: black !important;
+  background: white !important;
+  border-color: black !important;
+}
+
+.market-chart .apexcharts-tooltip:after {
+  border-top-color: black !important;
+}
+
+::ng-deep .apexcharts-text,
+::ng-deep .apexcharts-datalabel-label,
+::ng-deep .apexcharts-datalabel-value {
+  fill: black !important;
+  color: black !important;
+}
+
+::ng-deep .apexcharts-tooltip {
+  color: #1e293b !important;
+  background-color: #e2e8f0 !important;
+  font-weight: 600;
+}
+
+.custom-card {
+  background: #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);  /* base shadow */
+  border-radius: 0.75rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);  /* deeper glow on hover */
+}

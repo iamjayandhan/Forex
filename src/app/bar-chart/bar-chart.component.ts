@@ -93,7 +93,7 @@ export class BarChartComponent implements OnInit {
       const profitData = holdings.map(h => +(h.profit ?? 0).toFixed(2));
 
       this.chartOptions = {
-        chart: { type: 'bar', height: 260, width: 600, toolbar: { show: true },stacked:true },
+        chart: { type: 'bar', height: 210, width: 550, toolbar: { show: true },stacked:true },
         plotOptions: {
           bar: { horizontal: true, dataLabels: { position: 'top' }, barHeight: '40%' },
         },

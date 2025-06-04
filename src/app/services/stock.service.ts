@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface Stock {
@@ -21,70 +20,60 @@ export interface Stock {
 })
 export class StockService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   // GET: fetch all stocks
   getAllStocks(): Observable<any> {
-    return this.http.get(`${environment.apiUrl}/stocks`,{withCredentials:true}).pipe(catchError(this.handleError));
+    return this.http.get(`${environment.apiUrl}/stocks`, { withCredentials: true });
   }
 
-  // GET: get paginated stocks
-  // getPaginatedStocks(page: number, size: number, search: string = '') : Observable<any>{
-  //   const params: any = { page, size };
-  //   if (search.trim() !== '') {
-  //     params.search = search;
-  //   }
-  //   return this.http.get<any>(`${environment.apiUrl}/stocks/paginated`,{ params});
-  // }
+  // GET: fetch all sectors
+  getAllSectors(): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/stocks/sectors`, { withCredentials: true });
+  }
 
   // GET: get paginated ordered stocks
-  getPaginatedStocks(page: number, size: number, search: string = '',sortBy: string = 'id', sortOrder: string = 'asc') : Observable<any>{
-    const params: any = { page, size,sortBy, sortOrder };
+  getPaginatedStocks(
+    page: number,
+    size: number,
+    search: string = '',
+    sortBy: string = 'id',
+    sortOrder: string = 'asc',
+    sector?: string,
+    exchange?: string
+  ): Observable<any> {
+    const params: any = { page, size, sortBy, sortOrder };
+
     if (search.trim() !== '') {
       params.search = search;
     }
-    return this.http.get<any>(`${environment.apiUrl}/stocks/paginated`,{ withCredentials:true,params});
+    if (sector?.trim()) {
+      params.sector = sector;
+    }
+    if (exchange?.trim()) {
+      params.exchange = exchange;
+    }
+
+    return this.http.get<any>(`${environment.apiUrl}/stocks/paginated`, { withCredentials: true, params });
   }
 
   // GET: fetch stock by ID
   getStockById(id: number): Observable<any> {
-    return this.http.get(`${environment.apiUrl}/stocks/${id}`,{withCredentials:true}).pipe(catchError(this.handleError));
+    return this.http.get(`${environment.apiUrl}/stocks/${id}`, { withCredentials: true });
   }
 
-createStock(stock: Stock): Observable<any> {
-  console.log("Creating stock with data:", stock);
-  return this.http.post(`${environment.apiUrl}/stocks`, stock, {
-    withCredentials: true,
-  }).pipe(
-    catchError((error) => {
-      console.error("Error occurred during createStock:", error);
-      return this.handleError(error);
-    })
-  );
-}
-
+  // POST: create new stock
+  createStock(stock: Stock): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/stocks`, stock, { withCredentials: true });
+  }
 
   // PUT: partial update of stock
   updateStock(id: number, stock: Partial<Stock>): Observable<any> {
-    console.log(stock);
-    return this.http.put(`${environment.apiUrl}/stocks/${id}`,stock ,{withCredentials:true}).pipe(catchError(this.handleError));
+    return this.http.put(`${environment.apiUrl}/stocks/${id}`, stock, { withCredentials: true });
   }
 
   // DELETE: remove a stock
   deleteStock(id: number): Observable<any> {
-    return this.http.delete(`${environment.apiUrl}/stocks/${id}`,{withCredentials:true}).pipe(catchError(this.handleError));
-  }
-
-  // Error handling
-  private handleError(error: HttpErrorResponse) {
-    let errorMsg = 'An unknown error occurred!';
-    if (error.error instanceof ErrorEvent) {
-      // Client-side error
-      errorMsg = `Error: ${error.error.message}`;
-    } else {
-      // Server-side error
-      errorMsg = `Server returned code ${error.status}, error message is: ${error.error?.message || error.message}`;
-    }
-    return throwError(() => new Error(errorMsg));
+    return this.http.delete(`${environment.apiUrl}/stocks/${id}`, { withCredentials: true });
   }
 }

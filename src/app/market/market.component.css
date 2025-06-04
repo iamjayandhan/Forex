@@ -1,89 +1,185 @@
-.table td,
-.table th {
+.dark-blue-theme {
+  background-color: #0d1a2d; /* dark navy blue */
+  color: #f0f0f0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dark-blue-theme .card,
+.dark-blue-theme .card-body {
+  background-color: #1b2838;
+  color: #e0e1dd;
+  border: none;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+.dark-blue-theme .form-control,
+.dark-blue-theme .form-select {
+  background-color: #0d1b2a;
+  color: #e0e1dd;
+  border: 1px solid #3b82f6;
+}
+
+.dark-blue-theme .form-control:focus,
+.dark-blue-theme .form-select:focus {
+  border-color: #00dfd8;
+  box-shadow: none;
+  outline: none;
+}
+
+.dark-blue-theme .btn-outline-secondary {
+  color: #a1a1a1;
+  border-color: #374a72;
+}
+
+.dark-blue-theme .btn-outline-secondary:hover {
+  background-color: #374a72;
+  color: white;
+}
+
+.dark-blue-theme .table {
+  background-color: #1b2838;
+  color: #e0e1dd;
+}
+
+.dark-blue-theme .table thead {
+  background-color: #2f517b;
+  color: #e0e1dd;
+}
+
+.dark-blue-theme .table-hover tbody tr:hover {
+  background-color: #253447;
+}
+
+.dark-blue-theme .alert-warning {
+  background-color: #3e2d2d;
+  color: #f87171;
+  border: none;
+}
+
+.dark-blue-theme .alert-danger {
+  background-color: #3a1e1e;
+  color: #f87171;
+  border: none;
+}
+
+.dark-blue-theme .pagination .page-link {
+  background-color: #1b2838;
+  color: #e0e1dd;
+  border: 1px solid #374a72;
+}
+
+.dark-blue-theme .pagination .page-item.disabled .page-link {
+  color: #666;
+  background-color: #2f3e55;
+}
+
+
+.nav-sidebar {
+  width: 175px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0.5rem;
+  align-items: flex-start;
+  position: sticky;
+  top: 0;
+  font-family: Arial, sans-serif;
+}
+
+.nav-btn {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  margin-bottom: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.nav-btn.active {
+  background: #0dcaf0; /* bootstrap info color */
+  color: #0a3d58;
+  font-weight: 600;
+}
+
+
+/* Right side content styling */
+.content-area {
+  background-color: #0f223a;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(26, 188, 156, 0.15);
+  min-height: 80vh;
+  overflow-y: auto;
+  color: #e0e0e0;
+}
+
+/* table */
+.table {
+  font-size: 0.85rem; /* smaller font */
+}
+
+.table th, .table td {
+  padding: 0.3rem 0.5rem; /* less padding */
   vertical-align: middle;
 }
 
-.text-truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.table tr {
+  border-radius: 20%;
+  background-color: #96ddfc;
 }
 
-/* for the dark blue theme */
-.dark-blue-theme {
-  background: linear-gradient(135deg, #2f517b, #1b2838, #253447);
-
-  color: #e0e1dd;
-  min-height: 100vh;
-}
-
-/* for the table */
-
-.table-light-contrast {
-  width: 100%;
-  border-collapse: separate; /* important for spacing */
-  border-spacing: 0 3px; /* space between rows */
-  background-color: transparent; /* no table bg */
-  color: #212529;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-/* Remove default borders from th and td */
-.table-light-contrast th,
-.table-light-contrast td {
-  border: none;
-  padding: 6px 8px;
-  background-color: #e0e9f9;
-}
-
-/* Header style */
-.table-light-contrast thead tr {
-  background-color: #e0e0e0;
-  border-radius: 12px;
-}
-
-.table-light-contrast thead th {
+.table thead th {
   font-weight: 600;
-  color: #212529;
-  text-align: center;
-  padding: 14px 16px;
-  background-color: #85b0f9;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Row style */
-.table-light-contrast tbody tr {
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+.table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Row hover */
-.table-light-contrast tbody tr:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  background-color: #f9f9f9;
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
 }
 
-/* Center alignment for numeric columns */
-.table-light-contrast tbody td.text-center,
-.table-light-contrast thead th.text-center {
-  text-align: center;
+img.rounded {
+  width: 24px !important;
+  height: 24px !important;
 }
 
-/* Align right for price columns */
-.table-light-contrast tbody td.text-end,
-.table-light-contrast thead th.text-end {
-  text-align: right;
+.custom-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  z-index: 1040;                         
 }
 
-/* title with linearGradient*/
+.custom-card {
+  background: #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);  /* base shadow */
+  border-radius: 0.75rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-h1 {
-  font-size: 2.25rem; /* 36px */
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 3px solid #3b82f6; /* blue-500 */
+.custom-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);  /* deeper glow on hover */
 }

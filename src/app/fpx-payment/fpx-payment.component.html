@@ -1,0 +1,119 @@
+<div class="payment-container d-flex" style="display: flex; flex-wrap: wrap; gap: 20px;">
+  <form #paymentForm action="https://services.gomobi.io/payment/DirectToFPX.aspx" method="POST" style="width: 100%; display: flex; flex-wrap: wrap; gap: 20px;">
+    
+    <!-- Merchant Details -->
+    <section class="merchant-details" style="flex: 1 1 calc(33.33% - 20px); box-sizing: border-box;">
+      <h3>Merchant Details</h3>
+      <label>
+        Merchant Name:
+        <input type="text" name="merchantName" [(ngModel)]="merchantName" placeholder="Merchant name" />
+      </label>
+      <label>
+        Reference:
+        <input type="text" name="reference" [(ngModel)]="reference" placeholder="Reference number" readonly />
+      </label>
+      <label>
+        Amount:
+        <input type="number" name="amount" [(ngModel)]="amount" placeholder="Amount" />
+      </label>
+      <label>
+        Seller Order ID:
+        <input type="text" name="sellerOrderNo" [value]="sellerOrderNo" readonly />
+      </label>
+    </section>
+
+    <!-- Customer Details -->
+    <section class="customer-details" style="flex: 1 1 calc(33.33% - 20px); box-sizing: border-box;">
+      <h3>Customer Details</h3>
+      <label>
+        Customer Name
+        <input type="text" name="buyerName" [(ngModel)]="customerName" placeholder="Enter your name" />
+      </label>
+      <label>
+        Mobile Number
+        <input type="tel" name="mobile" [(ngModel)]="customerMobile" placeholder="Enter your mobile number" />
+      </label>
+      <label>
+        Email Address
+        <input type="email" name="email" [(ngModel)]="customerEmail" placeholder="Enter your email" />
+      </label>
+    </section>
+
+    <!-- Payment Method -->
+    <section class="payment-method" style="flex: 1 1 calc(33.33% - 20px); box-sizing: border-box;">
+      <h3>Payment Method</h3>
+      <label>
+        <input type="radio" name="paymentMethod" value="card" [(ngModel)]="paymentMethod" /> CREDIT / DEBIT CARD
+      </label>
+      <label>
+        <input type="radio" name="paymentMethod" value="internetBanking" [(ngModel)]="paymentMethod" /> INTERNET BANKING
+      </label>
+      <label>
+        <input type="radio" name="paymentMethod" value="eWallet" [(ngModel)]="paymentMethod" /> E-WALLET
+      </label>
+    </section>
+
+    <!-- Hidden Inputs with proper type and names -->
+    <input type="hidden" name="redirectUrl" value="http://localhost:8080/api/fpx/payment-response" />
+    <input type="hidden" name="mid" value="FPX000000054555" />
+    <input type="hidden" name="tid" value="27965678" />
+    <input type="hidden" name="service" value="FULL_LIST" />
+    <input type="hidden" name="subMid" value="201100000012450" />
+    <input type="hidden" name="checkSum" value="" />
+
+    <!-- Bank Type (Show only if Internet Banking is selected) -->
+    <section *ngIf="paymentMethod === 'internetBanking'" class="bank-type-section" style="flex: 1 1 calc(33.33% - 20px); box-sizing: border-box;">
+      <h3>Bank Type</h3>
+      <label>
+        <input type="radio" name="bankType" value="01" [(ngModel)]="selectedBankType" (change)="onBankTypeChange()" /> Retail Banking
+      </label>
+      <label>
+        <input type="radio" name="bankType" value="02" [(ngModel)]="selectedBankType" (change)="onBankTypeChange()" /> Corporate Banking
+      </label>
+    </section>
+
+    <!-- Bank List Dropdown -->
+    <section *ngIf="paymentMethod === 'internetBanking' && selectedBankType" class="bank-list-section" style="flex: 1 1 calc(33.33% - 20px); box-sizing: border-box;">
+      <h3>Bank</h3>
+      <div class="custom-dropdown">
+        <button type="button" (click)="toggleDropdown()" class="dropbtn text-black">
+          <ng-container *ngIf="selectedBank; else noBankSelected">
+            <img [src]="selectedBank.Logo || defaultLogo" width="50" alt="logo" style="vertical-align: middle; margin-right: 8px;" />
+            {{ selectedBank.BankDisplayName }}
+          </ng-container>
+          <ng-template #noBankSelected>
+            Select a bank
+          </ng-template>
+        </button>
+        <div *ngIf="showDropdown" class="dropdown-content">
+
+          <input 
+            type="text"
+            [(ngModel)]="bankSearch"
+            (input)="filterBankList()" 
+            placeholder="Search bank..."
+            [ngModelOptions]="{standalone: true}"
+            class="dropdown-search-input"
+          />
+          <div *ngFor="let bank of filteredBanks" (click)="selectBank(bank)" class="dropdown-item">
+            <img [src]="bank.Logo || defaultLogo" width="30" alt="logo" />
+            <span>{{ bank.BankDisplayName }}</span>
+          </div>
+        </div>
+      </div>
+      <!-- Hidden input to send selected bank code -->
+      <input type="hidden" name="bank" [value]="selectedBank?.BankCode || ''" />
+    </section>
+
+    <!-- Selected Bank Code display -->
+    <section *ngIf="selectedBank" class="selected-bank-code" style="flex: 1 1 calc(33.33% - 20px); box-sizing: border-box;">
+      <p><strong>Selected Bank Code:</strong> {{ selectedBank.BankCode }}</p>
+    </section>
+
+    <!-- Submit Button -->
+    <button type="submit" (click)="submitForm()" [disabled]="!canSubmit()" style="flex: 1 1 50%; padding: 12px; font-size: 18px; margin-top: 20px;">
+      Pay Now
+    </button>
+
+  </form>
+</div>

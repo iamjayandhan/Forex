@@ -1,117 +1,230 @@
-<div class="dark-blue-theme">
-  <div class="container py-4">
-    <h1 class="fw-bold mb-4">Available Stocks</h1>
-  
-    <!-- Loading & Error -->
-    <!-- <div *ngIf="loading" class="alert alert-info">Loading stocks...</div> -->
-    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-  
-    <!-- Search and Filters -->
-    <div class="row mb-4 g-3 align-items-center">
-      <div class="col-md-6">
-        <label class="form-label fw-semibold mb-1">Search for stock:</label>
-        <input
-          type="text"
-          class="form-control w-50"
-          placeholder="🔍 Stock name, symbol, sector..."
-          [(ngModel)]="searchQuery"
-          (input)="onSearch()"
-        />
-      </div>
-  
-      <div class="col-md-3">
-        <label class="form-label fw-semibold mb-1">Records per page:</label>
-        <select class="form-select" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
-          <option [value]="10">10</option>
-          <option [value]="20">20</option>
-          <option [value]="50">50</option>
-        </select>
-      </div>
+<div class="dark-blue-theme d-flex" style="min-height: 80vh;">
+
+  <!-- Left navigation sidebar -->
+  <nav class="nav-sidebar d-flex flex-column align-items-start p-3">
+    <button
+      class="btn nav-btn"
+      [class.active]="activeTab === 'status'"
+      (click)="activeTab = 'status'"
+    >
+      Market Status
+    </button>
+    <button
+      class="btn nav-btn"
+      [class.active]="activeTab === 'market'"
+      (click)="activeTab = 'market'"
+    >
+      Market
+    </button>
+  </nav>
+
+  <!-- Right content area -->
+  <div class="content-area flex-grow-1 p-4">
+
+    <!-- Market Status Tab -->
+    <div *ngIf="activeTab === 'status'">
+      <app-market-status-chart></app-market-status-chart>
     </div>
-  
-    <!-- Table -->
-    <div class="table-responsive">
-      <table *ngIf="stocks.length > 0" class="table table-bordered table-hover text-center align-middle table-light-contrast">
-        <thead class="table-light">
-          <tr>
-            <th>Logo</th>
-            <th (click)="onSort('name')" style="cursor:pointer">Name
-              <span *ngIf="sortBy === 'name'">
-                {{ sortOrder === 'asc' ? '↑' : '↓'  }}
-              </span>
-            </th>
-            <th (click)="onSort('symbol')" style="cursor:pointer">Symbol
-              <span *ngIf="sortBy === 'symbol'">
-                {{ sortOrder === 'asc' ? '↑' : '↓'  }}
-              </span>
-            </th>
-            <th (click)="onSort('exchange')" style="cursor:pointer">Exchange
-              <span *ngIf="sortBy === 'exchange'">
-                {{ sortOrder === 'asc' ? '↑' : '↓'  }}
-              </span>
-            </th>
-            <th (click)="onSort('sector')" style="cursor:pointer">Sector
-              <span *ngIf="sortBy === 'sector'">
-                {{ sortOrder === 'asc' ? '↑' : '↓'  }}
-              </span>
-            </th>
-            <th>Description</th>
-            <th (click)="onSort('currentPrice')" class="text-end" style="cursor:pointer">Price(₹)
-              <span *ngIf="sortBy === 'currentPrice'">
-                {{ sortOrder === 'asc' ? '↑' : '↓'  }}
-              </span>
-            </th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let stock of stocks">
-            <td>
-              <img
-                [src]="stock.imageUrl"
-                [alt]="stock.name + ' Logo'"
-                width="30"
-                height="30"
-                class="rounded border bg-white"
-                style="object-fit: contain;"
+
+    <!-- Market Tab -->
+    <div *ngIf="activeTab === 'market'">
+
+      <!-- Error message -->
+      <div *ngIf="error" class="alert alert-danger text-center">{{ error }}</div>
+
+      <!-- Filters Section -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <form class="row g-3 align-items-end">
+
+            <!-- Exchange Filter -->
+            <div class="col-md-2">
+              <label for="exchangeFilter" class="form-label fw-semibold">📈Exchange</label>
+              <select
+                id="exchangeFilter"
+                class="form-select"
+                [(ngModel)]="exchangeFilter"
+                (change)="onFilterChange()"
+                name="exchangeFilter"
+              >
+                <option value="">All</option>
+                <option *ngFor="let ex of exchanges" [value]="ex">{{ ex }}</option>
+              </select>
+            </div>
+
+            <!-- Sector Filter -->
+            <div class="col-md-2">
+              <label for="sectorFilter" class="form-label fw-semibold">🏭Sector</label>
+              <select
+                id="sectorFilter"
+                class="form-select"
+                [(ngModel)]="sectorFilter"
+                (change)="onFilterChange()"
+                name="sectorFilter"
+              >
+                <option value="">All</option>
+                <option *ngFor="let sector of sectors" [value]="sector">{{ sector }}</option>
+              </select>
+            </div>
+
+            <!-- Search Input -->
+            <div class="col-md-4">
+              <label for="searchInput" class="form-label fw-semibold">🔍Search</label>
+              <input
+                id="searchInput"
+                type="search"
+                class="form-control text-white"
+                placeholder="Stock name or symbol..."
+                [(ngModel)]="searchQuery"
+                (input)="onSearch()"
+                name="searchQuery"
+                autocomplete="off"
               />
-            </td>
-            <td class="fw-semibold">{{ stock.name }}</td>
-            <td>{{ stock.symbol }}</td>
-            <td>{{ stock.exchange }}</td>
-            <td>{{ stock.sector }}</td>
-            <td class="text-truncate" style="max-width: 200px;">{{ stock.description }}</td>
-            <td class="text-success fw-bold text-end">{{ stock.currentPrice | number: '1.2-2' }}</td>
-            <td>
-              <button class="btn btn-sm btn-outline-primary" (click)="goToBuy(stock)">Buy</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+
+            <!-- Records per page selector -->
+            <div class="col-md-2 d-flex flex-column">
+              <label for="pageSize" class="form-label fw-semibold">📄Records per page</label>
+              <select
+                id="pageSize"
+                class="form-select form-select-sm"
+                [(ngModel)]="pageSize"
+                (change)="onPageSizeChange()"
+                name="pageSize"
+              >
+                <option *ngFor="let size of [5,10,20,50,100]" [value]="size">{{ size }}</option>
+              </select>
+            </div>
+
+            <!-- Reset Button aligned right -->
+            <div class="col-md-2 d-flex justify-content-end align-items-end">
+              <button
+                type="button"
+                class="btn btn-outline-secondary w-100"
+                (click)="resetFilters()"
+                title="Reset all filters"
+              >
+                Reset Filters
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+      <!-- Stocks Table -->
+      <div class="card shadow-sm">
+        <div class="table-responsive">
+          <table *ngIf="stocks.length > 0" class="table table-bordered table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">Logo</th>
+                <th scope="col">Name</th>
+                <th scope="col">Symbol</th>
+                <th scope="col">Exchange</th>
+                <th scope="col">Sector</th>
+                <th scope="col">Description</th>
+                <th scope="col" class="text-end">Price (₹)</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let stock of stocks">
+                <td>
+                  <img
+                    [src]="stock.imageUrl"
+                    [alt]="stock.name + ' Logo'"
+                    class="rounded border bg-white"
+                    style="object-fit: contain;"
+                  />
+                </td>
+                <td class="fw-semibold" [title]="stock.name">{{ stock.name }}</td>
+                <td>{{ stock.symbol }}</td>
+                <td>{{ stock.exchange }}</td>
+                <td>{{ stock.sector }}</td>
+                <td class="description" [title]="stock.description">{{ stock.description }}</td>
+                <td class="text-success fw-bold text-end">{{ stock.currentPrice | number: '1.2-2' }}</td>
+                <td>
+                  <div style="display: flex;">
+                    <button class="btn btn-sm btn-outline-primary me-1" (click)="goToBuy(stock)">Buy</button>
+                    <button class="btn btn-sm btn-outline-info" (click)="openModal(stock)"><strong>:</strong></button>
+
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+
+          <!-- No Stocks Found -->
+          <div
+            *ngIf="!loading && !error && stocks.length === 0"
+            class="alert alert-warning text-center m-3"
+          >
+            No stocks found.
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <nav *ngIf="totalPages > 1" class="mt-4">
+        <ul class="pagination justify-content-center mb-0">
+          <li class="page-item" [class.disabled]="currentPage === 0">
+            <button class="page-link" (click)="onPageChange(currentPage - 1)">Previous</button>
+          </li>
+          <li class="page-item disabled">
+            <span class="page-link">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+            <button class="page-link" (click)="onPageChange(currentPage + 1)">Next</button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Modal for More Details -->
+
+      <!-- Backdrop -->
+      <div *ngIf="selectedStock" class="custom-backdrop"></div>
+
+      <div
+        class="modal fade show"
+        tabindex="-1"
+        *ngIf="selectedStock"
+        style="display: block;"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                {{ selectedStock.name }} ({{ selectedStock.symbol }})
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                (click)="closeModal()"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body text-start">
+              <p><strong>Exchange:</strong> {{ selectedStock.exchange }}</p>
+              <p><strong>Sector:</strong> {{ selectedStock.sector }}</p>
+              <p><strong>Description:</strong> {{ selectedStock.description }}</p>
+              <p><strong>Current Price:</strong> ₹{{ selectedStock.currentPrice | number: '1.2-2' }}</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+              <button type="button" class="btn btn-primary" (click)="goToBuy(selectedStock)">
+                Buy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
-  
-    <!-- No Stocks Found
-    <div *ngIf="!loading && !error && stocks.length === 0" class="alert alert-warning">
-      No stocks found.
-    </div> -->
-  
-    <!-- Pagination -->
-    <nav *ngIf="totalPages > 1" class="mt-4">
-      <ul class="pagination justify-content-center">
-        <li class="page-item" [class.disabled]="currentPage === 0">
-          <button class="page-link" (click)="onPageChange(currentPage - 1)">Previous</button>
-        </li>
-  
-        <li class="page-item disabled">
-          <span class="page-link">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
-        </li>
-  
-        <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
-          <button class="page-link" (click)="onPageChange(currentPage + 1)">Next</button>
-        </li>
-      </ul>
-    </nav>
+
   </div>
-
 </div>
-

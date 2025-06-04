@@ -12,12 +12,52 @@
     margin: 2rem;
 }
 
-/* Apply to outer container */
 .dark-blue-theme {
-  /* background-color: #0d1b2a; */
-  background: linear-gradient(135deg, #2f517b, #1b2838, #253447);
-  color: #e0e1dd;
-  min-height: 100vh;
+  background-color: #0d1a2d; /* dark navy blue */
+  color: #f0f0f0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+.nav-sidebar {
+  width: 175px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0.5rem;
+  align-items: flex-start;
+  position: sticky;
+  top: 0;
+  font-family: Arial, sans-serif;
+}
+
+.nav-btn {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  margin-bottom: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.nav-btn.active {
+  background: #0dcaf0; /* bootstrap info color */
+  color: #0a3d58;
+  font-weight: 600;
 }
 
 /* Profit and Loss Colors */
@@ -60,7 +100,7 @@ select.form-control {
 
 /* Header style */
 .table-light-contrast thead tr {
-  background-color: #e0e0e0;
+  background-color: #96ddfc;
   border-radius: 12px;
 }
 
@@ -148,14 +188,43 @@ h1 {
 .glow-danger   { box-shadow: 0 0 12px 3px rgba(220, 53, 69, 0.55); }  /* red     */
 .glow-neutral  { box-shadow: 0 0 10px 2px rgba(108, 117, 125, 0.35); }/* greyish */
 
-.custom-card {
-  background: #ffffff;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);  /* base shadow */
-  border-radius: 0.75rem;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* table */
+.table {
+  font-size: 0.85rem; /* smaller font */
 }
 
-.custom-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);  /* deeper glow on hover */
+.table th, .table td {
+  padding: 0.3rem 0.5rem; /* less padding */
+  vertical-align: middle;
 }
+
+.table thead th {
+  font-weight: 600;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+img.rounded {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+/* Right side content styling */
+.content-area {
+  background-color: #0f223a;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(26, 188, 156, 0.15);
+  min-height: 80vh;
+  overflow-y: auto;
+  color: #e0e0e0;
+}
+

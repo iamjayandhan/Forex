@@ -12,6 +12,7 @@ import { Subject } from 'rxjs';
 import SockJS from 'sockjs-client';
 import { Client, IMessage } from '@stomp/stompjs';
 import { RealTimeChartComponent } from '../charts/charts.component';
+import { TradingviewChartComponent } from '../tradingview-chart/tradingview-chart.component';
 // import { ChartsComponent } from '../charts/charts.component';
 
 @Component({
@@ -19,7 +20,7 @@ import { RealTimeChartComponent } from '../charts/charts.component';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   standalone: true,
-  imports:[CommonModule,RealTimeChartComponent]
+  imports:[CommonModule,RealTimeChartComponent,TradingviewChartComponent]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();

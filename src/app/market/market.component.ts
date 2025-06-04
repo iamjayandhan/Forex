@@ -9,18 +9,28 @@ import { UserProfile } from '../models/user-profile.model';
 
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { MarketStatusChartComponent } from '../market-status-chart/market-status-chart.component';
 
 @Component({
   selector: 'app-market',
   templateUrl: './market.component.html',
   styleUrls: ['./market.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule,MarketStatusChartComponent]
 })
 export class MarketComponent implements OnInit {
   stocks: any[] = [];
   user: UserProfile | null = null;
   currentWallet: number = 0;
+
+  activeTab: 'status' | 'market' = 'market';
+  
+  sectorFilter: string = '';
+  exchangeFilter: string = '';
+  sectors: string[] = []; 
+  exchanges: string[] = ['NSE', 'BSE'];
+
+  selectedStock: any = null;
 
   loading = true;
   error: string | null = null;
@@ -31,7 +41,7 @@ export class MarketComponent implements OnInit {
   sortBy: string = 'id';
   sortOrder: string = 'asc';
 
-  pageSize: number = 10;
+  pageSize: number = 5;
   currentPage: number = 0;
   totalRecords: number = 0;
 
@@ -44,10 +54,12 @@ export class MarketComponent implements OnInit {
   ngOnInit(): void {
     this.loadUser();
     this.fetchStocks();
+    this.fetchSectors();
 
     this.searchChanged.pipe(debounceTime(300)).subscribe(() => {
       this.currentPage = 0;
       this.fetchStocks();
+      this.fetchSectors();
     })
   }
 
@@ -66,7 +78,15 @@ export class MarketComponent implements OnInit {
 
   fetchStocks(): void {
     this.loading = true;
-    this.stockService.getPaginatedStocks(this.currentPage, this.pageSize, this.searchQuery,this.sortBy, this.sortOrder).subscribe({
+    this.stockService.getPaginatedStocks(
+      this.currentPage, 
+      this.pageSize, 
+      this.searchQuery,
+      this.sortBy, 
+      this.sortOrder,
+      this.sectorFilter,
+      this.exchangeFilter
+    ).subscribe({
       next: (response) => {
         const result = response.data;
         this.stocks = result.content;
@@ -82,16 +102,47 @@ export class MarketComponent implements OnInit {
     });
   }
 
-  onSort(column: string): void {
-  if (this.sortBy === column) {
-    // Toggle sorting order
-    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
-  } else {
-    this.sortBy = column;
-    this.sortOrder = 'asc';
+  fetchSectors():void{
+    this.stockService.getAllSectors().subscribe({
+      next: (response)=>{
+        this.sectors = response.data;
+      },
+      error: (err)=> {
+          this.notyf.error("Failed to load sectors: "+err);
+      },
+    })
   }
-  this.fetchStocks();
-}
+
+  openModal(stock: any) {
+    this.selectedStock = stock;
+  }
+
+  closeModal() {
+    this.selectedStock = null;
+  }
+
+  resetFilters(): void {
+    this.sectorFilter = '';
+    this.exchangeFilter = '';
+    this.searchQuery = '';
+    this.sortBy = 'id';
+    this.sortOrder = 'asc';
+    this.currentPage = 0;
+    this.pageSize = 5;
+    this.fetchStocks();
+    this.fetchSectors();
+  }
+
+  onSort(column: string): void {
+    if (this.sortBy === column) {
+      // Toggle sorting order
+      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = column;
+      this.sortOrder = 'asc';
+    }
+    this.fetchStocks();
+  }
 
   onSearch(): void {
     this.currentPage = 0;
@@ -102,6 +153,11 @@ export class MarketComponent implements OnInit {
     // },1000);
 
     this.searchChanged.next(this.searchQuery);
+  }
+
+  onFilterChange(): void {
+    this.currentPage = 0;
+    this.fetchStocks();
   }
 
   onPageSizeChange(): void {

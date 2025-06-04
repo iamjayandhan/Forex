@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NotyfService } from '../services/notyf.service';
 import { UserProfile } from '../models/user-profile.model';
 import { UserService } from '../services/user.service';
 import { PortfolioService } from '../services/portfolio.service';
+import { NseService } from '../services/nse.service';
+import { FpxPaymentService } from '../services/fpx-payment.service';
 
 declare var bootstrap: any;
 
@@ -18,6 +20,27 @@ declare var bootstrap: any;
 })  
 export class BuyComponent implements OnInit {
 
+  //hidden payment form
+  @ViewChild('paymentForm') paymentForm!: ElementRef<HTMLFormElement>;
+  //fields
+  merchantName = 'MOBI ASIA SDN. BHD.';
+  reference = '';
+  amount : number = 0;
+  sellerOrderNo = '';
+
+  customerName = '';
+  customerMobile = '';
+  customerEmail = '';
+
+  paymentMethod: '' | 'card' | 'internetBanking' | 'eWallet' = '';
+  selectedBankType: string = '01';
+  selectedBank: any = null;
+
+  b2cBanks: any[] = [];
+  b2bBanks: any[] = [];
+  filteredBanks: any[] = [];
+
+  //buy component's variables
   user: UserProfile | null = null;
   enteredMPIN: string = '';
   mpinError: string = '';
@@ -30,12 +53,23 @@ export class BuyComponent implements OnInit {
   showConfirmModal: boolean = false;
 
   readonly SELL_LIMIT = 100000;
+  
+  // Controls dropdown visibility
+  showDropdown = false;
+
+  // Default bank logo URL if bank has no logo
+  defaultLogo = 'https://picsum.photos/200';
+
+  // Search text for filtering bank list
+  bankSearch: string = '';
 
   constructor(
     public router: Router,
     private notyf: NotyfService,
     private userService: UserService,
     private portfolioService: PortfolioService,
+    private nseService: NseService,
+    private fpxService: FpxPaymentService
   ) {
     const navigation = this.router.getCurrentNavigation();
     this.stock = navigation?.extras?.state?.['stock'];
@@ -44,40 +78,165 @@ export class BuyComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  if (!this.userService.getUser()) {
+    this.userService.getUserProfile().subscribe((res) => {
+      this.userService.setUser(res.data);
+
+      this.userService.currentUser$.subscribe((userData) => {
+        this.user = userData;
+
+        // for hidden form
+        this.customerName = this.user?.fullName!;
+        this.customerMobile = this.user?.mobileNumber!;
+        this.customerEmail = this.user?.email!;
+        this.amount = this.totalCost;
+      });
+    });
+  } else {
     this.userService.currentUser$.subscribe((userData) => {
       this.user = userData;
-      // console.log("user acc info for purchase:",userData);
-    });
 
-    // Fetch user data if not already set
-    if (!this.userService.getUser()) {
-      this.userService.getUserProfile().subscribe((data) => {
-        this.userService.setUser(data);
-      });
-    }
+      // for hidden form
+      this.customerName = this.user?.fullName!;
+      this.customerMobile = this.user?.mobileNumber!;
+      this.customerEmail = this.user?.email!;
+      this.amount = this.totalCost;
+    });
   }
+
+  // Always run these
+  this.getNseInfo(this.stock.symbol);
+  this.generateReference();
+  this.generateSellerOrderId();
+  this.fetchBankList();
+}
+
+    // Toggle dropdown visibility and reset bank search
+  toggleDropdown(): void {
+    this.showDropdown = !this.showDropdown;
+    this.bankSearch = '';
+    this.updateFilteredBanks();
+  }
+
+
+
+  //methods for hidden form!
+   private generateReference(): void {
+    const today = new Date();
+    this.reference = `${today.getFullYear()}${(today.getMonth() + 1).toString().padStart(2,'0')}${today.getDate().toString().padStart(2,'0')}`;
+  }
+
+  private generateSellerOrderId(): void {
+    this.sellerOrderNo = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  }
+
+  private fetchBankList(): void {
+    this.fpxService.getBankList().subscribe({
+      next: (res) => {
+        console.log(res);
+        this.b2cBanks = res.responseDataB2C?.bankList || [];
+        this.b2bBanks = res.responseDataB2B?.bankList || [];
+        this.updateFilteredBanks();
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  onBankTypeChange(): void {
+    this.selectedBank = null;
+    this.updateFilteredBanks();
+  }
+
+  // Update filtered bank list based on selected bank type and search input
+  updateFilteredBanks(): void {
+    const sourceList =
+      this.selectedBankType === '01'
+        ? this.b2cBanks
+        : this.selectedBankType === '02'
+        ? this.b2bBanks
+        : [];
+
+    const search = this.bankSearch.trim().toLowerCase();
+
+    this.filteredBanks = sourceList.filter(bank =>
+      bank.BankDisplayName.toLowerCase().includes(search)
+    );
+  }
+
+  // Called when user types in the bank search input
+  filterBankList(): void {
+    this.updateFilteredBanks();
+  }
+
+  selectBank(bank: any): void {
+    this.selectedBank = bank;
+    this.showDropdown = false;
+  }
+
+  canSubmit(): boolean {
+    if (!this.customerName.trim() || !this.customerMobile.trim()) return false;
+    if (!this.paymentMethod) return false;
+    if (this.paymentMethod === 'internetBanking') {
+      if (!this.selectedBankType || !this.selectedBank) return false;
+    }
+    return true;
+  }
+
+  submitForm(): void {
+    this.paymentForm.nativeElement.submit();
+  }
+  //end of methods for hidden form!
+
+  getNseInfo(symbol: string){
+    // console.log(symbol);
+    this.nseService.fetchEquityChartDetails(symbol).subscribe({
+      next: (response)=>{
+        console.log(response);
+      },
+      error: (err)=> {
+        console.log(err);
+      },
+    });
+  }
+  
+  // onQuantityChange(value: number) {
+  //   if (value < 1 || !Number.isInteger(value)) {
+  //     this.quantity = 0;
+  //   }
+  //   else if (value > this.stock.ipoQty) {
+  //     this.notyf.error('Quantity exceeds available stock');
+  //     this.quantity = this.stock.ipoQty;
+  //   } 
+  //   else {
+  //     this.quantity = Math.floor(value);
+  //     this.amount = this.totalCost;
+  //   }
+  // }
 
   onQuantityChange(value: number) {
     if (value < 1 || !Number.isInteger(value)) {
       this.quantity = 0;
-    }
-    else if (value > this.stock.ipoQty) {
+    } else if (value > this.stock.ipoQty) {
       this.notyf.error('Quantity exceeds available stock');
       this.quantity = this.stock.ipoQty;
-    } 
-    else {
+    } else {
       this.quantity = Math.floor(value);
     }
+
+    console.log("Qty:", this.quantity, "Subtotal:", this.subtotal, "Total:", this.totalCost, "Amount:", this.amount);
   }
+
 
   incrementQty(){
     if(this.quantity < this.stock.ipoQty){
       this.quantity++;
+      this.amount = this.totalCost;
     }
   }
   decrementQty(){
     if(this.quantity > 1){
       this.quantity--;
+      this.amount = this.totalCost;
     }
   }
 
@@ -117,69 +276,63 @@ export class BuyComponent implements OnInit {
     this.enteredMPIN = '';
     this.mpinError = '';
     this.balanceError = '';
-    
-    // const backdrop = document.querySelector('.modal-backdrop');
-    // if (backdrop) {
-    //   backdrop.remove();
-    // }
   }
 
   confirmBuyOrder() {
-  this.isPlacingOrder = true;
+    this.isPlacingOrder = true;
 
-  const orderPayload = {
-    email: this.user?.email,
-    stockId: this.stock.id,
-    quantity: this.quantity,
-    balance: this.user?.balance,
-    transactionType: 'BUY',
-    pricePerUnit: this.stock.currentPrice,
-    subtotal: this.subtotal,
-    brokerage: this.brokerage,
-    exchangeTxnCharges: this.exchangeTxnCharges,
-    stampDuty: this.stampDuty,
-    ipft: this.ipft,
-    sebiCharges: this.sebiCharges,
-    stt: this.stt,
-    gst: this.gst,
-    totalAmount: this.totalCost,
-    avgPrice: this.stock.currentPrice,
-  };
+    const orderPayload = {
+      email: this.user?.email,
+      stockId: this.stock.id,
+      quantity: this.quantity,
+      subtotal: this.subtotal,
+      totalAmount: this.totalCost,
+      balance: this.user?.balance,
+    };
 
+    localStorage.setItem('orderPayload', JSON.stringify(orderPayload));
 
-  this.portfolioService.placeBuyOrder(orderPayload).subscribe({
-    next: (response) => {
-      this.isPlacingOrder = false;
+    // this.portfolioService.placeBuyOrder(orderPayload).subscribe({
+    //   next: (response) => {
+    //     this.isPlacingOrder = false;
+    //     this.closeConfirmModal();
+    //     this.notyf.success(response.message);
+    //     this.router.navigate(['/portfolio']); 
+    //   },
+    //   error: (error) => {
+    //     this.isPlacingOrder = false;
+    //     this.notyf.error('Failed to place order. Please try again.');
+    //     console.error(error);
+    //   }
+    // });
+
+    // console.log("User balance: ",this.user!.balance - this.totalCost);
+    
+    this.isPlacingOrder = false;
+
+    const transactionPayload = {
+      userId: this.user!.userId,
+      amount: this.totalCost,
+      transactionType: 'WITHDRAW',
+      transactionReason: 'STOCK_PURCHASE',
+      balance: this.user!.balance - this.totalCost,
+    };
+
+    localStorage.setItem('transactionPayload', JSON.stringify(transactionPayload));
+    this.submitForm();
+    // this.portfolioService.saveWalletTransaction(transactionPayload).subscribe({
+    //   next : (response)=>{
+    //     console.log(response);
+    //   },
+    //   error : (err)=>{
+    //     console.log(err);
+    //   }
+    // })
+
+    setTimeout(()=>{
       this.closeConfirmModal();
-      this.notyf.success(response.message);
-      this.router.navigate(['/portfolio']); 
-    },
-    error: (error) => {
-      this.isPlacingOrder = false;
-      this.notyf.error('Failed to place order. Please try again.');
-      console.error(error);
-    }
-  });
-
-  console.log("User balance: ",this.user!.balance - this.totalCost);
-
-  const transactionPayload = {
-    userId: this.user!.userId,
-    amount: this.totalCost,
-    transactionType: 'WITHDRAW',
-    transactionReason: 'STOCK_PURCHASE',
-    balance: this.user!.balance - this.totalCost,
-  };
-
-  this.portfolioService.saveWalletTransaction(transactionPayload).subscribe({
-    next : (response)=>{
-      console.log(response);
-    },
-    error : (err)=>{
-      console.log(err);
-    }
-  })
-}
+    },2000);
+  }
 
   get isBuyLimitExceeded(): boolean {
     // Allow if quantity is exactly 1 regardless of subtotal

@@ -1,0 +1,25 @@
+<div class="market-container">
+  <h2 class="market-status-title">Market Status</h2>
+
+  <div *ngIf="marketCharts.length === 0" class="no-data">
+    No valid market data available.
+  </div>
+
+  <div class="charts-grid">
+    <div *ngFor="let chart of marketCharts" class="chart-wrapper custom-card">
+      <apx-chart
+        [series]="chart.options.series!"
+        [chart]="chart.options.chart!"
+        [colors]="chart.options.colors!"
+        [title]="chart.options.title!"
+        [xaxis]="chart.options.xaxis!"
+        [yaxis]="chart.options.yaxis!"
+        [dataLabels]="chart.options.dataLabels!"
+        [stroke]="chart.options.stroke!"
+        [grid]="chart.options.grid!"
+        [fill]="chart.options.fill!"
+        class="market-chart"
+      ></apx-chart>
+    </div>
+  </div>
+</div>

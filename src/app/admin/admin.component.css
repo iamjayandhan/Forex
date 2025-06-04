@@ -14,6 +14,38 @@ h1 {
 }
 
 
+.dark-blue-theme .card,
+.dark-blue-theme .card-body {
+  background-color: #1b2838;
+  color: #e0e1dd;
+  border: none;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+.dark-blue-theme .form-control,
+.dark-blue-theme .form-select {
+  background-color: #0d1b2a;
+  color: #e0e1dd;
+  border: 1px solid #3b82f6;
+}
+
+.dark-blue-theme .form-control:focus,
+.dark-blue-theme .form-select:focus {
+  border-color: #00dfd8;
+  box-shadow: none;
+  outline: none;
+}
+
+.dark-blue-theme .btn-outline-secondary {
+  color: #a1a1a1;
+  border-color: #374a72;
+}
+
+.dark-blue-theme .btn-outline-secondary:hover {
+  background-color: #374a72;
+  color: white;
+}
+
 .table-light-contrast {
   width: 100%;
   border-collapse: separate; /* important for spacing */
