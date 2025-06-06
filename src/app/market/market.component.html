@@ -16,6 +16,14 @@
     >
       Market
     </button>
+    <button
+      class="btn nav-btn"
+      [class.active]="activeTab === 'watchlist'"
+      (click)="activeTab = 'watchlist'"
+    >
+      Watchlist
+    </button>
+
   </nav>
 
   <!-- Right content area -->
@@ -95,6 +103,12 @@
                 <option *ngFor="let size of [5,10,20,50,100]" [value]="size">{{ size }}</option>
               </select>
             </div>
+
+            <!-- watchlist -->
+             <div class="d-flex justify-content-end mb-2">
+              <button class="btn btn-outline-success" (click)="openWishlistModal()">+ Wishlist</button>
+            </div>
+
 
             <!-- Reset Button aligned right -->
             <div class="col-md-2 d-flex justify-content-end align-items-end">
@@ -226,5 +240,122 @@
 
     </div>
 
+   <div *ngIf="activeTab === 'watchlist'" class="p-3">
+
+      <table *ngIf="watchlistStocks.length > 0; else noWatchlist" class="table table-bordered table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Logo</th>
+            <th scope="col">Name</th>
+            <th scope="col">Symbol</th>
+            <th scope="col">Exchange</th>
+            <th scope="col">Sector</th>
+            <th scope="col">Description</th>
+            <th scope="col" class="text-end">Price (₹)</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let stock of watchlistStocks">
+            <td>
+              <img
+                [src]="stock.imageUrl"
+                [alt]="stock.name + ' Logo'"
+                class="rounded border bg-white"
+                style="object-fit: contain;"
+              />
+            </td>
+            <td class="fw-semibold" [title]="stock.name">{{ stock.name }}</td>
+            <td>{{ stock.symbol }}</td>
+            <td>{{ stock.exchange }}</td>
+            <td>{{ stock.sector }}</td>
+            <td class="description" [title]="stock.description">{{ stock.description }}</td>
+            <td class="text-success fw-bold text-end">{{ stock.currentPrice | number: '1.2-2' }}</td>
+            <td>
+              <button (click)="removeFromWatchlist(stock.id)" class="btn btn-sm btn-outline-danger">Remove</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #noWatchlist>
+        <p class="text-muted">Your watchlist is empty.</p>
+      </ng-template>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- At the bottom of market.component.html -->
+
+<!-- Wishlist Modal -->
+<div
+  *ngIf="isWishlistModalOpen"
+  class="modal fade show d-block"
+  tabindex="-1"
+  style="background-color: rgba(0, 0, 0, 0.5);"
+>
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">📌 Add to Watchlist</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeWishlistModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Search -->
+        <input
+          [(ngModel)]="wishlistSearchQuery"
+          (input)="filterWishlistStocks()"
+          placeholder="Search stocks..."
+          class="form-control mb-3"
+        />
+
+        <div class="row">
+          <!-- Left: Market Stocks -->
+          <div class="col-md-6 mb-3">
+            <h6>Available Stocks</h6>
+            <div class="border rounded p-2" style="height: 300px; overflow-y: auto;">
+              <div *ngFor="let stock of filteredWishlistStocks">
+                <div
+                  class="d-flex justify-content-between align-items-center py-1 px-2 mb-1 bg-light rounded hover-shadow cursor-pointer"
+                  (click)="addToTempWishlist(stock)"
+                  style="cursor: pointer;"
+                >
+                  <span>{{ stock.symbol }} - ₹{{ stock.currentPrice }}</span>
+                  <span class="text-primary">Add</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Selected Stocks -->
+          <div class="col-md-6 mb-3">
+            <h6>Selected Stocks</h6>
+            <div class="border rounded p-2" style="height: 300px; overflow-y: auto;">
+              <div *ngFor="let stock of tempWishlist">
+                <div class="d-flex justify-content-between align-items-center py-1 px-2 mb-1 bg-light rounded">
+                  <span>{{ stock.symbol }} - ₹{{ stock.currentPrice }}</span>
+                  <button class="btn btn-sm btn-danger" (click)="removeFromTempWishlist(stock)">Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="submitWishlist()"
+          [disabled]="tempWishlist.length === 0"
+        >
+          ✅ Add to Watchlist
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="closeWishlistModal()">Close</button>
+      </div>
+    </div>
   </div>
 </div>

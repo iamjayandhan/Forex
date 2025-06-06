@@ -20,7 +20,7 @@ import { TradingviewChartComponent } from '../tradingview-chart/tradingview-char
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   standalone: true,
-  imports:[CommonModule,RealTimeChartComponent,TradingviewChartComponent]
+  imports:[CommonModule,RealTimeChartComponent]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();

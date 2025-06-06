@@ -23,7 +23,7 @@ export class MarketComponent implements OnInit {
   user: UserProfile | null = null;
   currentWallet: number = 0;
 
-  activeTab: 'status' | 'market' = 'market';
+  activeTab: 'status' | 'market' | 'watchlist' = 'market';
   
   sectorFilter: string = '';
   exchangeFilter: string = '';
@@ -44,6 +44,18 @@ export class MarketComponent implements OnInit {
   pageSize: number = 5;
   currentPage: number = 0;
   totalRecords: number = 0;
+
+  //watchlist
+  watchlistStocks: any[] = [];
+  userId!: number;
+  wishlistSectorFilter: string = '';
+  wishlistExchangeFilter: string = '';
+  wishlistSearchQuery: string = '';
+
+  allMarketStocks: any[] = [];  
+  tempWishlist: any[] = [];
+  isWishlistModalOpen: boolean = false;
+  filteredWishlistStocks: any[] = [];
 
   constructor(private stockService: StockService, 
     private notyf: NotyfService,
@@ -66,11 +78,13 @@ export class MarketComponent implements OnInit {
   loadUser(): void {
     this.userService.currentUser$.subscribe((userData) => {
       this.user = userData;
-      if (this.user) {
-        this.currentWallet = this.user.balance;
-      }
-    });
 
+      if (this.user) {
+          this.currentWallet = this.user.balance;
+          this.userId = this.user.userId;
+          this.loadWatchlist();
+        }
+      });
     this.userService.getUserProfile().subscribe((res) => {
       this.userService.setUser(res.data);
     });
@@ -112,6 +126,142 @@ export class MarketComponent implements OnInit {
       },
     })
   }
+
+  loadWatchlist(): void {
+    this.stockService.getUserWatchlist(this.userId).subscribe({
+      next: (res: any) => {
+        this.watchlistStocks = res.data;
+      },
+      error: (err) => {
+        console.error("Failed to fetch watchlist", err);
+      }
+    });
+  }
+
+  loadAllMarketStocks(): void {
+    this.stockService.getAllStocks().subscribe({
+      next: (res) => {
+        this.allMarketStocks = res.data;
+      },
+      error: (err) => {
+        this.notyf.error('Failed to load stocks');
+        console.error(err);
+      }
+    });
+  }
+
+  addToTempWishlist(stock: any): void {
+    if (!this.tempWishlist.find(s => s.id === stock.id)) {
+      this.tempWishlist.push(stock);
+    }
+  }
+
+  removeFromTempWishlist(stock: any): void {
+    this.tempWishlist = this.tempWishlist.filter(s => s.id !== stock.id);
+  }
+
+  submitWishlist(): void {
+    if (this.tempWishlist.length === 0) {
+      this.notyf.error('Please add some stocks first');
+      return;
+    }
+
+    const payload = this.tempWishlist.map(stock => ({
+      stockId: stock.id,
+      userId: this.userId
+    }));
+
+    console.log(this.tempWishlist);
+    console.log(payload);
+
+    this.stockService.addStocksToWatchlist(payload).subscribe({
+      next: () => {
+        this.notyf.success('Stocks added to watchlist');
+        this.closeWishlistModal();
+        this.loadWatchlist();
+      },
+      error: (err) => {
+        this.notyf.error('Failed to add to watchlist');
+        console.error(err);
+      }
+    });
+  }
+
+  removeFromWatchlist(stockId: number): void {
+    this.stockService.deleteStockFromWatchlist(this.userId, stockId).subscribe({
+      next: () => {
+        this.loadWatchlist();
+      },
+      error: (err) => {
+        console.error("Failed to remove from watchlist", err);
+      }
+    });
+  }
+  openWishlistModal(): void {
+    this.wishlistSearchQuery = '';
+    this.wishlistExchangeFilter = '';
+    this.wishlistSectorFilter = '';
+    this.tempWishlist = [];
+
+    // Step 1: Load user watchlist
+    this.stockService.getUserWatchlist(this.userId).subscribe({
+      next: (res) => {
+        this.watchlistStocks = Array.isArray(res.data) ? res.data : [];
+
+        // Step 2: Load all stocks
+        this.stockService.getAllStocks().subscribe({
+          next: (stockResponse) => {
+            this.allMarketStocks = stockResponse.data || [];
+
+            // Step 3: Exclude already watchlisted stocks
+            this.filteredWishlistStocks = this.allMarketStocks.filter(stock =>
+              !this.watchlistStocks.some(watchStock => watchStock.id === stock.id)
+            );
+
+            this.isWishlistModalOpen = true;
+          },
+          error: () => {
+            this.notyf.error('Failed to load market stocks');
+          }
+        });
+      },
+      error: () => {
+        this.notyf.error('Failed to load user watchlist');
+
+        // Still attempt to open modal with all stocks if watchlist failed
+        this.stockService.getAllStocks().subscribe({
+          next: (stockResponse) => {
+            this.allMarketStocks = stockResponse.data || [];
+            this.filteredWishlistStocks = [...this.allMarketStocks];
+            this.isWishlistModalOpen = true;
+          },
+          error: () => {
+            this.notyf.error('Failed to load market stocks');
+          }
+        });
+      }
+    });
+  }
+
+
+
+  closeWishlistModal(): void {
+    this.isWishlistModalOpen = false;
+    this.tempWishlist = [];
+  }
+
+  filterWishlistStocks(): void {
+    const query = this.wishlistSearchQuery.toLowerCase();
+
+    this.filteredWishlistStocks = this.allMarketStocks
+      .filter(stock =>
+        !this.watchlistStocks.some(watchStock => watchStock.id === stock.id) &&  // exclude watchlisted
+        (!this.wishlistSectorFilter || stock.sector === this.wishlistSectorFilter) &&
+        (!this.wishlistExchangeFilter || stock.exchange === this.wishlistExchangeFilter) &&
+        (stock.name.toLowerCase().includes(query) || stock.symbol.toLowerCase().includes(query))
+      );
+  }
+
 
   openModal(stock: any) {
     this.selectedStock = stock;

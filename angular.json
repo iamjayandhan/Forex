@@ -37,8 +37,7 @@
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/apexcharts/dist/apexcharts.min.js",
-              "src/assets/tradingview-widget.js"
+              "node_modules/apexcharts/dist/apexcharts.min.js"
             ]
           },
           "configurations": {
@@ -100,8 +99,7 @@
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/apexcharts/dist/apexcharts.min.js",
-              "src/assets/tradingview-widget.js"
+              "node_modules/apexcharts/dist/apexcharts.min.js"
             ]
           }
         }

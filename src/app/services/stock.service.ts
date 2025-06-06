@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { ApiResponse } from '../models/ApiResponse.model';
 
 export interface Stock {
   id?: number;
@@ -75,5 +76,19 @@ export class StockService {
   // DELETE: remove a stock
   deleteStock(id: number): Observable<any> {
     return this.http.delete(`${environment.apiUrl}/stocks/${id}`, { withCredentials: true });
+  }
+
+  //watch list methods
+  getUserWatchlist(userId : number){
+    return this.http.get<ApiResponse<Stock[]>>(`${environment.apiUrl}/watchlist/${userId}`,{withCredentials: true});
+  }
+
+  addStocksToWatchlist(watchlistItems: { userId: number, stockId: number }[]) {
+    return this.http.post(`${environment.apiUrl}/watchlist`, watchlistItems, { withCredentials: true });
+  }
+
+  deleteStockFromWatchlist(userId: number, stockId: number){
+    const payload = {userId, stockId};
+    return this.http.delete(`${environment.apiUrl}/watchlist`,{ body:payload, withCredentials:true});
   }
 }
