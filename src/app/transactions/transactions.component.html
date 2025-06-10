@@ -36,6 +36,7 @@
         <option [value]="10">10</option>
         <option [value]="20">20</option>
       </select>
+      <button class="btn btn-sm btn-outline-primary" (click)="downloadTransactions()">Export to CSV</button>
     </div>
 
     <div *ngFor="let txn of transactions" class="card mb-1 shadow-sm small" style="cursor: pointer;" (click)="openTransactionModal(txn)">

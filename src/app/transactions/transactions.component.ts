@@ -4,6 +4,7 @@ import { UserService } from '../services/user.service';
 import { UserProfile } from '../models/user-profile.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ExportService } from '../services/export.service';
 
 @Component({
   selector: 'app-transactions',
@@ -36,7 +37,8 @@ export class TransactionsComponent implements OnInit {
 
   constructor(
     private portfolioService: PortfolioService,
-    private userService: UserService
+    private userService: UserService,
+    private exportService: ExportService
   ) {}
 
   ngOnInit(): void {
@@ -91,6 +93,17 @@ export class TransactionsComponent implements OnInit {
         this.error = 'Failed to load transactions';
         this.isLoading = false;
       }
+    });
+  }
+
+  downloadTransactions() {
+    this.exportService.downloadTransactionsCSV(this.user?.userId!).subscribe(blob => {
+      const a = document.createElement('a');
+      const objectUrl = URL.createObjectURL(blob);
+      a.href = objectUrl;
+      a.download = 'transactions.csv';
+      a.click();
+      URL.revokeObjectURL(objectUrl);
     });
   }
 

@@ -4,13 +4,14 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './navbar/navbar.component';
 import { CommonModule } from '@angular/common';
 import { NotyfService } from './services/notyf.service';
+import { LoaderComponent } from './loader/loader.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   standalone: true,
-  imports: [CommonModule,FormsModule,RouterOutlet,NavbarComponent],
+  imports: [CommonModule,FormsModule,RouterOutlet,NavbarComponent,LoaderComponent],
 })
 
 export class AppComponent implements OnInit {

@@ -1,18 +1,20 @@
-<div class="payment-status-container" [ngClass]="{'success-box': paymentStatus === 'success', 'failure-box': paymentStatus !== 'success'}">
+<div class="payment-status-container" [ngClass]="{ 'success-box': isSuccess, 'failure-box': !isSuccess }">
   <h2>Payment Status</h2>
 
-  <div *ngIf="paymentStatus && orderNo && transactionId; else loading">
-    <p>
-      <strong>Status:</strong>
-      <span>{{ paymentStatus }}</span>
-    </p>
+  <p><strong>Status:</strong> {{ paymentStatus }}</p>
+
+  <ng-container *ngIf="orderNo && transactionId; else missingDetails">
     <p><strong>Order ID:</strong> {{ orderNo }}</p>
     <p><strong>Transaction ID:</strong> {{ transactionId }}</p>
+  </ng-container>
 
-    <button (click)="navigateToPortfolio()">Portfolio</button>
-  </div>
-
-  <ng-template #loading>
-    <p>Loading payment details...</p>
+  <ng-template #missingDetails>
+    <p><em>Order ID or Transaction ID not available.</em></p>
+    <p>Please contact support if you believe this is an error.</p>
   </ng-template>
+
+  <p><strong>Auth Code:</strong> {{ fpxAuthCode || 'N/A' }}</p>
+  <p><strong>Description:</strong> {{ errorMessage || 'No description available.' }}</p>
+
+  <button (click)="navigateToPortfolio()">Go to Portfolio</button>
 </div>

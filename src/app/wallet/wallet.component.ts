@@ -5,6 +5,7 @@ import { UserProfile } from '../models/user-profile.model'; // Assuming UserProf
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../services/portfolio.service';
+import { ExportService } from '../services/export.service';
 
 @Component({
   selector: 'app-wallet-management',
@@ -33,6 +34,7 @@ export class WalletComponent implements OnInit {
     private userService: UserService, 
     private notyf: NotyfService,
     private portfolioService: PortfolioService,
+    private exportService: ExportService
   ) {}
 
   activeTab = 'wallet';
@@ -132,6 +134,18 @@ export class WalletComponent implements OnInit {
 //     }
 //   });
 // }
+
+  downloadWalletTransactions() {
+    this.exportService.downloadWalletTransactionsCSV(this.user?.userId!).subscribe(blob => {
+      const a = document.createElement('a');
+      const objectUrl = URL.createObjectURL(blob);
+      a.href = objectUrl;
+      a.download = 'wallet-transactions.csv';
+      a.click();
+      URL.revokeObjectURL(objectUrl);
+    });
+  }
+
   onPageSizeChange(){
     this.currentPage = 0;
     this.loadWalletTransactionsPaginated(this.currentPage, this.pageSize);

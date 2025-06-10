@@ -89,6 +89,7 @@
           <select id="pageSize" class="form-select w-auto" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
             <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
           </select>
+          <button class="btn btn-outline-primary" (click)="downloadWalletTransactions()">Export to CSV</button>
         </div>
         
         <div *ngIf="transactions.length > 0; else noTransactions">

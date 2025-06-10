@@ -47,8 +47,9 @@ export class NavbarComponent implements OnInit {
   }
 
   navigateTo(route: string): void {
+
     this.activeRoute = route;
-    
+        
     if(route === "transactions"){
       this.router.navigate([`transactions/${this.user?.userId}`]);
     }else{

@@ -115,6 +115,7 @@
         [disabled]="isQuantityInvalid || stockNotAvailable() || isBuyLimitExceeded"
         data-bs-toggle="modal"
         data-bs-target="#confirmModal"
+        (click)="handleProceedToBuy()"
       >
         Proceed to Buy
       </button>
@@ -245,7 +246,8 @@
             <input type="hidden" name="tid" value="27965678" />
             <input type="hidden" name="service" value="FULL_LIST" />
             <input type="hidden" name="subMid" value="201100000012450" />
-            <input type="hidden" name="checkSum" value="" />
+            <input type="hidden" name="checkSum" [(ngModel)]="checksum" />
+             <!-- <input type="hidden" name="checkSum" value=""/> -->
 
 
             <input type="hidden" name="bankType" [value]="selectedBankType" [(ngModel)]="selectedBankType" />

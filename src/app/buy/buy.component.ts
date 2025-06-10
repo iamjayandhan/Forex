@@ -8,8 +8,7 @@ import { UserService } from '../services/user.service';
 import { PortfolioService } from '../services/portfolio.service';
 import { NseService } from '../services/nse.service';
 import { FpxPaymentService } from '../services/fpx-payment.service';
-
-declare var bootstrap: any;
+import { LoaderService } from '../services/loader.service';
 
 @Component({
   selector: 'app-buy',
@@ -42,12 +41,16 @@ export class BuyComponent implements OnInit {
 
   //buy component's variables
   user: UserProfile | null = null;
+  userId: number = 0;
   enteredMPIN: string = '';
   mpinError: string = '';
   balanceError: string = '';
 
   stock: any;
+  stockId: number = -1;
   quantity: number = 1;
+  checksum: string = '';
+  subMid: string = '201100000012450';
 
   isPlacingOrder: boolean = false;
   showConfirmModal: boolean = false;
@@ -69,11 +72,14 @@ export class BuyComponent implements OnInit {
     private userService: UserService,
     private portfolioService: PortfolioService,
     private nseService: NseService,
-    private fpxService: FpxPaymentService
+    private fpxService: FpxPaymentService,
+    private loader: LoaderService
   ) {
     const navigation = this.router.getCurrentNavigation();
     this.stock = navigation?.extras?.state?.['stock'];
+    this.stockId = this.stock.id;
 
+    console.log("The stock user going to buy is: "+ this.stock.id);
     // console.log("stock data for buy:", this.stock);
   }
 
@@ -84,6 +90,7 @@ export class BuyComponent implements OnInit {
 
       this.userService.currentUser$.subscribe((userData) => {
         this.user = userData;
+        this.userId = this.user?.userId!;
 
         // for hidden form
         this.customerName = this.user?.fullName!;
@@ -107,9 +114,43 @@ export class BuyComponent implements OnInit {
   // Always run these
   this.getNseInfo(this.stock.symbol);
   this.generateReference();
-  this.generateSellerOrderId();
   this.fetchBankList();
 }
+
+  // encryptPayload(minifiedString: string, param1: string, param2: string): string {
+  //   const CIPHER_KEY_LEN = 256;
+  //   const ITERATION_COUNT = 65536;
+
+  //   try {
+  //     // 1. Generate random 16-byte IV
+  //     const iv = CryptoJS.lib.WordArray.random(16);
+
+  //     // 2. Generate AES key from param1 and param2 using PBKDF2WithHmacSHA256
+  //     const key = CryptoJS.PBKDF2(param1, CryptoJS.enc.Utf8.parse(param2), {
+  //       keySize: CIPHER_KEY_LEN / 32,
+  //       iterations: ITERATION_COUNT,
+  //       hasher: CryptoJS.algo.SHA256,
+  //     });
+
+  //     // 3. Encrypt with AES/CBC/PKCS7
+  //     const encrypted = CryptoJS.AES.encrypt(minifiedString, key, {
+  //       iv: iv,
+  //       mode: CryptoJS.mode.CBC,
+  //       padding: CryptoJS.pad.Pkcs7, // CryptoJS uses PKCS7 which is compatible with PKCS5
+  //     });
+
+  //     // 4. Convert to WordArray to manipulate IV + CipherText
+  //     const encryptedWords = CryptoJS.enc.Base64.parse(encrypted.toString());
+  //     const combined = iv.concat(encryptedWords);
+
+  //     // 5. Encode final result as Base64
+  //     return CryptoJS.enc.Base64.stringify(combined);
+  //   } catch (error) {
+  //     console.error('Encryption error:', error);
+  //     return '';
+  //   }
+  // }
+
 
     // Toggle dropdown visibility and reset bank search
   toggleDropdown(): void {
@@ -118,17 +159,26 @@ export class BuyComponent implements OnInit {
     this.updateFilteredBanks();
   }
 
-
-
   //methods for hidden form!
    private generateReference(): void {
     const today = new Date();
     this.reference = `${today.getFullYear()}${(today.getMonth() + 1).toString().padStart(2,'0')}${today.getDate().toString().padStart(2,'0')}`;
   }
 
-  private generateSellerOrderId(): void {
-    this.sellerOrderNo = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  // private generateSellerOrderId(): void {
+  //   this.sellerOrderNo = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  // }
+  private generateSellerOrderId(userId: number, stockId: number,quantity: number, subTotalPrice: number): void {
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000);
+
+    // Replace dot with 'D' in totalPrice (e.g., 2450.75 → 2450D75)
+    const sanitizedTotalPrice = subTotalPrice.toFixed(2).replace('.', 'D');
+
+    this.sellerOrderNo = `ORDX${userId}X${stockId}X${quantity}X${sanitizedTotalPrice}X${random}`;
+    console.log(this.sellerOrderNo);
   }
+
 
   private fetchBankList(): void {
     this.fpxService.getBankList().subscribe({
@@ -198,20 +248,25 @@ export class BuyComponent implements OnInit {
       },
     });
   }
-  
-  // onQuantityChange(value: number) {
-  //   if (value < 1 || !Number.isInteger(value)) {
-  //     this.quantity = 0;
-  //   }
-  //   else if (value > this.stock.ipoQty) {
-  //     this.notyf.error('Quantity exceeds available stock');
-  //     this.quantity = this.stock.ipoQty;
-  //   } 
-  //   else {
-  //     this.quantity = Math.floor(value);
-  //     this.amount = this.totalCost;
-  //   }
-  // }
+
+  handleProceedToBuy() {
+    this.generateSellerOrderId(this.user?.userId!, this.stockId, this.quantity, this.subtotal);
+
+    // const minifiedString = `${this.totalCost}|${this.sellerOrderNo}|${this.subMid}`;
+    const MID = "FPX000000054555";
+    const TID = "27965678";
+
+    this.fpxService.encryptPayload(this.totalCost,this.sellerOrderNo,this.subMid, MID, TID).subscribe({
+      next: (encrypted) => {
+        this.checksum = encrypted;
+        console.log('Checksum:', this.checksum);
+      },
+      error: (err) => {
+        console.error('Encryption failed:', err);
+      }
+    });
+  }
+
 
   onQuantityChange(value: number) {
     if (value < 1 || !Number.isInteger(value)) {
@@ -222,7 +277,6 @@ export class BuyComponent implements OnInit {
     } else {
       this.quantity = Math.floor(value);
     }
-
     console.log("Qty:", this.quantity, "Subtotal:", this.subtotal, "Total:", this.totalCost, "Amount:", this.amount);
   }
 
@@ -278,10 +332,76 @@ export class BuyComponent implements OnInit {
     this.balanceError = '';
   }
 
-  confirmBuyOrder() {
+  // confirmBuyOrder() {
+  //   this.isPlacingOrder = true;
+
+  //   const orderPayload = {
+  //     email: this.user?.email,
+  //     stockId: this.stock.id,
+  //     quantity: this.quantity,
+  //     subtotal: this.subtotal,
+  //     totalAmount: this.totalCost,
+  //     balance: this.user?.balance,
+  //   };
+
+  //   // localStorage.setItem('orderPayload', JSON.stringify(orderPayload));
+
+  //   this.portfolioService.placeBuyOrder(orderPayload).subscribe({
+  //     next: (response) => {
+  //       this.isPlacingOrder = false;
+  //       this.closeConfirmModal();
+  //       this.notyf.success(response.message);
+  //     },
+  //     error: (error) => {
+  //       this.isPlacingOrder = false;
+  //       this.notyf.error('Failed to place order. Please try again.');
+  //       console.error(error);
+  //     }
+  //   });
+
+  //   // console.log("User balance: ",this.user!.balance - this.totalCost);
+    
+  //   this.isPlacingOrder = false;
+
+  //   const transactionPayload = {
+  //     userId: this.user!.userId,
+  //     amount: this.totalCost,
+  //     transactionType: 'WITHDRAW',
+  //     transactionReason: 'STOCK_PURCHASE',
+  //     balance: this.user!.balance - this.totalCost,
+  //   };
+
+  //   // localStorage.setItem('transactionPayload', JSON.stringify(transactionPayload));
+  //   this.submitForm();
+
+  //   this.portfolioService.saveWalletTransaction(transactionPayload).subscribe({
+  //     next : (response)=>{
+  //       console.log(response);
+  //     },
+  //     error : (err)=>{
+  //       console.log(err);
+  //     }
+  //   })
+
+  //   setTimeout(()=>{
+  //     this.closeConfirmModal();
+  //   },2000);
+  // }
+  
+ confirmBuyOrder() {
+    this.loader.show("Connecting with FPX payment gateway for smoother process...please wait.");
     this.isPlacingOrder = true;
 
     const orderPayload = {
+      userId: this.user!.userId,
+      stockId: this.stock.id,
+      quantity: this.quantity,
+      subTotalPrice: this.subtotal,
+      extraCharges: this.totalCost - this.subtotal,
+      transactionType: "BUY"
+    };
+
+    const orderPayload2 = {
       email: this.user?.email,
       stockId: this.stock.id,
       quantity: this.quantity,
@@ -290,49 +410,35 @@ export class BuyComponent implements OnInit {
       balance: this.user?.balance,
     };
 
-    localStorage.setItem('orderPayload', JSON.stringify(orderPayload));
+    console.log('Order Payload:', orderPayload);
 
-    // this.portfolioService.placeBuyOrder(orderPayload).subscribe({
-    //   next: (response) => {
-    //     this.isPlacingOrder = false;
-    //     this.closeConfirmModal();
-    //     this.notyf.success(response.message);
-    //     this.router.navigate(['/portfolio']); 
-    //   },
-    //   error: (error) => {
-    //     this.isPlacingOrder = false;
-    //     this.notyf.error('Failed to place order. Please try again.');
-    //     console.error(error);
-    //   }
-    // });
-
-    // console.log("User balance: ",this.user!.balance - this.totalCost);
-    
-    this.isPlacingOrder = false;
-
-    const transactionPayload = {
-      userId: this.user!.userId,
-      amount: this.totalCost,
-      transactionType: 'WITHDRAW',
-      transactionReason: 'STOCK_PURCHASE',
-      balance: this.user!.balance - this.totalCost,
-    };
-
-    localStorage.setItem('transactionPayload', JSON.stringify(transactionPayload));
-    this.submitForm();
-    // this.portfolioService.saveWalletTransaction(transactionPayload).subscribe({
-    //   next : (response)=>{
-    //     console.log(response);
-    //   },
-    //   error : (err)=>{
-    //     console.log(err);
-    //   }
-    // })
-
-    setTimeout(()=>{
-      this.closeConfirmModal();
-    },2000);
+    // Step 1: Create pending order
+    this.fpxService.createPendingOrder(orderPayload).subscribe({
+      next: (response) => {
+        console.log('Pending order created:', response);
+        
+        // Step 2: Only if pending order creation succeeds
+        this.portfolioService.placeBuyOrder(orderPayload2).subscribe({
+          next: () => {
+            this.isPlacingOrder = false;
+            this.closeConfirmModal();
+            this.submitForm();  // move this here to be sure everything is placed
+          },
+          error: (buyError) => {
+            this.isPlacingOrder = false;
+            this.notyf.error('Failed to place buy order. Please try again.');
+            console.error(buyError);
+          }
+        });
+      },
+      error: (error) => {
+        this.isPlacingOrder = false;
+        this.notyf.error('Failed to place order. Please try again.');
+        console.error('Error creating pending order:', error);
+      }
+    });
   }
+
 
   get isBuyLimitExceeded(): boolean {
     // Allow if quantity is exactly 1 regardless of subtotal

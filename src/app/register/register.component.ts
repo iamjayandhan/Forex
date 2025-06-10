@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NotyfService } from '../services/notyf.service';
 import { EmailService } from '../services/email.service';
+import { LoaderService } from '../services/loader.service';
 
 declare var bootstrap : any;
 
@@ -44,7 +45,8 @@ export class RegisterComponent {
     private authService: AuthService, 
     private router: Router,
     private notyf: NotyfService,
-    private emailService : EmailService
+    private emailService : EmailService,
+    private loader: LoaderService
   ) {}
 
   passwordValidations = {
@@ -192,9 +194,11 @@ export class RegisterComponent {
         next: (res) => {
           this.successMsg = res.message || 'Registration successful!';
           this.notyf.success("Registration successful!");
+          this.loader.show("Redirecting to login page...please wait.");
           setTimeout(() => {
             this.router.navigate(['/login']);
-          }, 1500);
+            this.loader.hide();
+          }, 2000);
         },
         error: (err) => {
           this.notyf.error(err.error?.message || "Registration failed. Please try again.");
